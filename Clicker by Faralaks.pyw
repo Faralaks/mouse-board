@@ -19,6 +19,7 @@ sys.stdout = log_file
 sys.stderr = log_file
 print("\n\n <-------------| Logging Clicker by Faralaks |-------------> \n", dt.datetime.now(), "\n")
 
+
 class About(tk.Toplevel):
     def __init__(self, parent, photo, write_func, frame):
         super().__init__(parent)
@@ -59,12 +60,22 @@ class App(tk.Tk):
         self.geometry("290x1080+0+0")
         self.title("Clicker by Faralaks")
         icon = path.join("\\".join(path.split(path.abspath(__file__))[:-1]), "icon.png")
-        
+
         self.iconphoto(True, tk.PhotoImage(file=icon))
         self.bind("<Escape>", lambda event: self.destroy())
 
         self.points_texts = [None, None]
-        self.click_interval = tk.StringVar(value="0.1")
+        self.click_interval = "0.1"
+        self.macros_interval = "-1"
+
+        menu = tk.Menu(self)
+        int_menu = tk.Menu(menu)
+        int_menu.add_command(label='Между кликами', command=lambda:  self.change_click_int(
+                                        pag.prompt("Стандартный интервал между кликами в секундах, например 1 или 1.5")))
+        int_menu.add_command(label='Между запусками', command=lambda: self.change_macros_int(
+                                        pag.prompt("Интервал между перезапуском макроса в минутах, например 10 или 10.5, -1 для отмены автоперезапуска")))
+        menu.add_cascade(label="Интервалы", menu=int_menu)
+        self.config(menu=menu)
 
         tk.Button(self.frame, text="Скриншот", command=lambda: self.open_window(0)).grid(row=0, column=0)
         tk.Button(self.frame, text="Сохранить", command=lambda: self.save(0)).grid(row=1, column=0)
@@ -73,7 +84,6 @@ class App(tk.Tk):
         self.points_texts[0] = tk.Text(self.frame, width=13, height=50, wrap=tk.WORD)
         self.points_texts[0].grid(row=6, column=0)
 
-        tk.Entry(textvariable=self.click_interval, width=3).grid(row=0, column=0)
         tk.Button(self.frame, text="<<-", command=lambda: self.move_points(1, 0)).grid(row=1, column=1)
         tk.Button(self.frame, text="->>", command=lambda: self.move_points(0, 1)).grid(row=2, column=1)
 
@@ -84,10 +94,17 @@ class App(tk.Tk):
         self.points_texts[1] = tk.Text(self.frame, width=13, height=50, wrap=tk.WORD)
         self.points_texts[1].grid(row=6, column=2)
 
+    def change_click_int(self, new_val):
+        if not new_val: return
+        self.click_interval = new_val
+
+    def change_macros_int(self, new_val):
+        if not new_val: return
+        self.macros_interval = new_val
 
     def write_points(self, frame, text, with_time=True):
         if not with_time: 
-            text += "-"+self.click_interval.get()
+            text += "-"+self.click_interval
         self.points_texts[frame].insert(tk.END, text+"\n")
 
     def save(self, frame):
