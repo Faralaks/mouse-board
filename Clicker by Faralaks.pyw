@@ -140,11 +140,14 @@ class App(tk.Tk):
         self.wm_state("iconic")
         time.sleep(0.5)
 
-        for three in points:
-            x, y, i = three.split("-")
-            x, y, i = int(x), int(y), float(i)
-            pag.click(x, y, 1, 0, "left")
-            time.sleep(i)
+        while True:
+            for three in points:
+                x, y, i = three.split("-")
+                x, y, i = int(x), int(y), float(i)
+                pag.click(x, y, 1, 0, "left")
+                time.sleep(i)
+            if self.macros_interval == "-1": break
+            time.sleep(60*float(self.macros_interval))
         
         self.deiconify()
         
