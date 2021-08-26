@@ -4,9 +4,10 @@ import sys
 import time
 import pyperclip as clipboard
 import tkinter as tk
-from os import path
-from tkinter import messagebox as mb
+from os import path, sep
+from tkinter.messagebox import showerror as error
 from tkinter.filedialog import askopenfile, asksaveasfile, askopenfilename
+import functions as fn
 
 import pyautogui as pag
 from PIL import ImageTk
@@ -22,68 +23,6 @@ log_file = open("log.txt", "a")
 #sys.stdout = log_file
 #sys.stderr = log_file
 print("\n\n <-------------| Logging Clicker by Faralaks |-------------> \n", dt.datetime.now(), "\n")
-
-
-
-class Command():
-    cmd = ""
-    params = None
-    i = 0
-    full = ""
-
-    def __init__(self, line: str):
-        splited = line.split(CMD_SEPARATOR)
-        self.cmd = splited[0]
-        self.params = splited[1:]
-        self.full = line
-        try:
-            self.i = float(splited[-1])
-        except:
-            self.i = 0
-
-    def __repr__(self) -> str:
-        return "cmd: %s, params: %s, i: %d"%(self.cmd, self.params, self.i)
-
-
-    
-
-def click(command: Command, check=False):
-    print("click called by line  |  "+command.full)
-    x, y, btn = int(command.params[0]), int(command.params[1]), command.params[2]
-    
-    if check:
-        if not pag.onScreen(x, y):
-            mb.showerror("Слыш, Такой точки нет!", "На экране нет точки с координатами (%s, %s)"%(x, y))
-            return True
-        if btn != "left" and btn != "right":
-            mb.showerror("Слыш, Такой клавиши нет!",
-                "При клике на точку с координатами (%s, %s) нажимается неизвестаная клавиша %s"%(x, y, btn))
-            return True
-        return False
-    
-    pag.click(x, y, 1, 0, btn)
-
-
-def write(command: Command = None, text: str="", check=False):
-    print("write called by line  |  "+(command.full if command else "See in previous call"))
-    if not text: text = command.params[0]
-    buffer = clipboard.paste()
-    clipboard.copy(text)
-    pag.hotkey("ctrl", "v")
-    clipboard.copy(buffer)
-
-def from_file(command: Command, check=False):
-    print("from_file called by line  |  "+command.full)
-    file_path = command.params[0]
-    if check:
-        if not path.exists(file_path):
-            mb.showerror("There is no such file!", "No file found in path %s"%file_path)
-            return True
-        return False
-
-    with open(file_path, "r") as f:
-        write(text=f.read())
-
 
 
 class About(tk.Toplevel):
@@ -133,7 +72,7 @@ class App(tk.Tk):
         self.click_interval = "0.1"
         self.macros_interval = "-1"
 
-        self.funcs = {"click":click, "write":write, "file":from_file}
+        self.funcs = {"click":fn.Click, "write":fn.Write, "file":fn.File}
 
         menu = tk.Menu(self)
         file_menu = tk.Menu(menu)
@@ -189,21 +128,25 @@ class App(tk.Tk):
             self.write_points(three)
         f.close()
 
+    def line2obj(self, line: str) -> object:
+        splited = line.split(CMD_SEPARATOR)
+        func = self.funcs.get(splited[0])
+        if not func:
+            error("Bad function name in line", line)
+            return None
+        return func(splited, line)
+
     def start_clicking(self):
         lines = self.macros.get("1.0", tk.END).strip().split("\n")
-        commands = list(map(Command, lines))
+        commands = list(map(self.line2obj, lines))
+        if None in commands: return
         
         self.wm_state("iconic")
         time.sleep(0.5)
 
         print("\t @Start checking")
         for command in commands:
-            print(command)
-            func = self.funcs.get(command.cmd)
-            if not func:
-                mb.showerror("Bad function name!", "In line \"%s\" function name is so bad!"%command.full)
-                return
-            if func(command, check=True):
+            if command.check():
                 print("@ERROR in previous line")
                 return
             
@@ -211,7 +154,7 @@ class App(tk.Tk):
 
 
         for command in commands:
-            self.funcs[command.cmd](command)
+            command.do()
             time.sleep(command.i)
 
             
