@@ -58,7 +58,7 @@ class Click(Command):
         return False
 
 
-class write(Command):
+class Write(Command):
     text = ""
 
     def __init__(self, splited: list, full: str) -> None:
