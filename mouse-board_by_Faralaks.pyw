@@ -2,15 +2,15 @@ import datetime as dt
 import os
 import sys
 import time
-import pyperclip as clipboard
 import tkinter as tk
-from os import path, sep
-from tkinter.messagebox import showerror as error
+from os import path
 from tkinter.filedialog import askopenfile, asksaveasfile, askopenfilename
-import functions as fn
+from tkinter.messagebox import showerror as error
 
 import pyautogui as pag
 from PIL import ImageTk
+
+import functions as fn
 
 PATH_SEPARATOR = "\\"if sys.platform=="win32" else "/"
 CMD_SEPARATOR = '@'
@@ -20,8 +20,8 @@ pag.FAILSAFE = False
 
 log_file = open("log.txt", "a")
 
-#sys.stdout = log_file
-#sys.stderr = log_file
+sys.stdout = log_file
+sys.stderr = log_file
 print("\n\n <-------------| Logging Clicker by Faralaks |-------------> \n", dt.datetime.now(), "\n")
 
 
@@ -75,7 +75,6 @@ class App(tk.Tk):
         self.funcs = {"click":fn.Click, "write":fn.Write, "file":fn.File}
 
         menu = tk.Menu(self)
-        file_menu = tk.Menu(menu)
         int_menu = tk.Menu(menu)
         menu.add_command(label='Открыть', command=self.load)
         menu.add_command(label='Сохранить', command=self.save)
@@ -128,17 +127,17 @@ class App(tk.Tk):
             self.write_points(three)
         f.close()
 
-    def line2obj(self, line: str) -> object:
-        splited = line.split(CMD_SEPARATOR)
-        func = self.funcs.get(splited[0])
+    def line2cmd(self, line: str) -> [None, fn.Click, fn.Write, fn.File]:
+        split = line.split(CMD_SEPARATOR)
+        func = self.funcs.get(split[0])
         if not func:
             error("Bad function name in line", line)
             return None
-        return func(splited, line)
+        return func(split, line)
 
     def start_clicking(self):
         lines = self.macros.get("1.0", tk.END).strip().split("\n")
-        commands = list(map(self.line2obj, lines))
+        commands = list(map(self.line2cmd, lines))
         if None in commands: return
         
         self.wm_state("iconic")
@@ -149,20 +148,13 @@ class App(tk.Tk):
             if command.check():
                 print("@ERROR in previous line")
                 return
-            
+        self.deiconify()
         print("\t @Finish checking! No errors!")
-
 
         for command in commands:
             command.do()
             time.sleep(command.i)
 
-            
-
-
-        
-        self.deiconify()
-        
 
     def open_window(self):
         self.wm_state("iconic")

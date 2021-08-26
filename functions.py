@@ -1,4 +1,3 @@
-from tkinter.messagebox import NO
 import pyautogui as pag
 import pyperclip as clipboard
 from tkinter.messagebox import showerror as error
@@ -11,19 +10,19 @@ def paste_text(text):
     pag.hotkey("ctrl", "v")
     clipboard.copy(buffer)
 
-class Command():
+class Command:
     cmd = ""
     params = None
     i = 0
     full = ""
 
-    def __init__(self, splited: list, full: str) -> None: 
-        self.cmd = splited[0]
-        self.params = splited[1:]
+    def __init__(self, split: list, full: str) -> None:
+        self.cmd = split[0]
+        self.params = split[1:]
         self.full = full
         try:
-            self.i = float(splited[-1])
-        except:
+            self.i = float(split[-1])
+        except ValueError:
             self.i = 0
 
     def __repr__(self) -> str:
@@ -39,8 +38,8 @@ class Click(Command):
     btn = ""
 
 
-    def __init__(self, splited: list, full: str) -> None:
-        super().__init__(splited, full)
+    def __init__(self, split: list, full: str) -> None:
+        super().__init__(split, full)
         self.x, self.y, self.btn = int(self.params[0]), int(self.params[1]), self.params[2]
                 
     def do(self) -> None:
@@ -61,8 +60,8 @@ class Click(Command):
 class Write(Command):
     text = ""
 
-    def __init__(self, splited: list, full: str) -> None:
-        super().__init__(splited, full)
+    def __init__(self, split: list, full: str) -> None:
+        super().__init__(split, full)
         self.text = self.params[0]
                 
     def do(self) -> None:
@@ -76,8 +75,8 @@ class Write(Command):
 class File(Command):
     file_path = ""
 
-    def __init__(self, splited: list, full: str) -> None:
-        super().__init__(splited, full)
+    def __init__(self, split: list, full: str) -> None:
+        super().__init__(split, full)
         self.file_path = path.abspath(self.params[0]) if self.params[0][0] == "." else self.params[0]
                 
     def do(self) -> None:
