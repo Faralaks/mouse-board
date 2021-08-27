@@ -22,8 +22,8 @@ pag.FAILSAFE = False
 
 log_file = open("log.txt", "a")
 
-#sys.stdout = log_file
-#sys.stderr = log_file
+sys.stdout = log_file
+sys.stderr = log_file
 print("\n\n <-------------| Logging Clicker by Faralaks |-------------> \n", dt.datetime.now(), "\n")
 
 
