@@ -5,7 +5,17 @@ A strange but native GUI. This project is mainly based on tkinter and PyAutoGUI
 
 It was created especially for Windows but other platforms are potentially supported.
 
-# Usage (Windows):
+# Program features
+- Writing macros to emulate mouse clicks and keyboadr.
+- Taking a screenshot and recording clicks on it.
+- Adding an interval between commands.
+- Paste text from file.
+- Find file on computer.
+- Saving macros to files.
+- Logging to a text file.
+
+
+# Usage (Windows)
 1. Download last realise binary from [Releases page](https://github.com/Faralaks/mouse-board/releases).
 2. Execute it:) You may need to give permission to launch it.
 3. Write scripts in main text field (See [Language](#Language)).
