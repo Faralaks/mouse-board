@@ -20,7 +20,7 @@ It was created especially for Windows but other platforms are potentially suppor
 - Last parameter is always Delay before next command.
 - Below you can see the syntax of the commands:
 
-#Syntax
+# Syntax
 - click - Click on screen
 
 `click@x@y@button@delay`
