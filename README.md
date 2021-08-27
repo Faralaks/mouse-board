@@ -83,5 +83,6 @@ In the future, I want to add some commands:
 - dclick - double click.
 - image - click on image on screen.
 - wimage - waits before image appears on screen.
+- press - preses some key on keyboard.
 
 Also, I want to add some functionality to ScreenShot button. It should be able to cut out part of the image from the screenshot for the convenience of the image and wimage commands.
