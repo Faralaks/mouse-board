@@ -19,7 +19,7 @@ It was created especially for Windows but other platforms are potentially suppor
 1. Download last realise binary from [Releases page](https://github.com/Faralaks/mouse-board/releases).
 2. Execute it:) You may need to give permission to launch it.
 3. Write scripts in main text field (See [Language](#Language)).
-4. Press RUN Script button.
+4. Press RUN Macros button.
 5. Enjoy!
 
 # Language
