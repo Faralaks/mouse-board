@@ -2,6 +2,7 @@ import datetime as dt
 import os
 import sys
 import time
+import webbrowser as browser
 import tkinter as tk
 from os import path
 from tkinter.filedialog import askopenfile, asksaveasfile, askopenfilename
@@ -92,6 +93,8 @@ class App(tk.Tk):
             pag.prompt("Enter a standard interval between commands in seconds, for example, 1 or 1.5")))
         menu.add_command(label='Separator', command=lambda: change_separator(
             pag.prompt("Enter a new separator, for example, @ or -")))
+        menu.add_command(label='Need Help?', command=lambda : browser.open("https://github.com/Faralaks/mouse-board"))
+
 
         self.config(menu=menu)
 
