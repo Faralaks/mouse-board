@@ -6,6 +6,7 @@ import tkinter as tk
 from os import path
 from tkinter.filedialog import askopenfile, asksaveasfile, askopenfilename
 from tkinter.messagebox import showerror as error
+from typing import Union
 
 import pyautogui as pag
 from PIL import ImageTk
@@ -20,8 +21,8 @@ pag.FAILSAFE = False
 
 log_file = open("log.txt", "a")
 
-sys.stdout = log_file
-sys.stderr = log_file
+#sys.stdout = log_file
+#sys.stderr = log_file
 print("\n\n <-------------| Logging Clicker by Faralaks |-------------> \n", dt.datetime.now(), "\n")
 
 
@@ -46,14 +47,24 @@ class About(tk.Toplevel):
         self.canvas.grid(row=0, column=0)
         
         self.canvas.bind('<1>', self.click)
+        self.canvas.bind('<3>', self.click)
         self.bind("<Escape>", self.on_escape)
         
     def on_escape(self, _):
         self.parent.deiconify()
         self.destroy()
 
-    def click(self, event):
-        self.write("%s-%s"%(event.x, event.y), with_time=False)
+    def click(self, event: tk.Event):
+        print(type(event))
+        self.write("click"+CMD_SEPARATOR+"%s%s%s%s%s"%(
+            event.x, CMD_SEPARATOR, event.y, CMD_SEPARATOR, "right" if event.num==3 else "left"), with_time=False)
+
+
+
+def change_separator(new_val):
+    if not new_val: return
+    global CMD_SEPARATOR
+    CMD_SEPARATOR = new_val
 
 
 class App(tk.Tk):
@@ -69,20 +80,19 @@ class App(tk.Tk):
         self.iconphoto(True, tk.PhotoImage(file=icon))
         self.bind("<Escape>", lambda event: self.destroy())
 
-        self.click_interval = "0.1"
+        self.interval = 0.1
         self.macros_interval = "-1"
 
-        self.funcs = {"click":fn.Click, "write":fn.Write, "file":fn.File}
+        self.funcs = {"click":fn.Click, "write":fn.Write, "file":fn.File, "wait":fn.Wait}
 
         menu = tk.Menu(self)
-        int_menu = tk.Menu(menu)
-        menu.add_command(label='Открыть', command=self.load)
-        menu.add_command(label='Сохранить', command=self.save)
-        int_menu.add_command(label='Между кликами', command=lambda:  self.change_click_int(
-                pag.prompt("Стандартный интервал между кликами в секундах, например 1 или 1.5")))
-        int_menu.add_command(label='Между запусками', command=lambda: self.change_macros_int(
-                pag.prompt("Интервал между перезапуском макроса в минутах, например 10 или 10.5, -1 для отмены автоперезапуска")))
-        menu.add_cascade(label="Интервалы", menu=int_menu)
+        menu.add_command(label='Open', command=self.load)
+        menu.add_command(label='Save', command=self.save)
+        menu.add_command(label='Interval', command=lambda: self.change_interval(
+            pag.prompt("Enter a standard interval between commands in seconds, for example, 1 or 1.5")))
+        menu.add_command(label='Separator', command=lambda: change_separator(
+            pag.prompt("Enter a new separator, for example, @ or -")))
+
         self.config(menu=menu)
 
         tk.Button(self.frame, text="RUN Macros", command=self.start_clicking).grid(row=0, column=0)
@@ -92,17 +102,18 @@ class App(tk.Tk):
         self.macros.grid(row=3, column=0, columnspan=10)
 
 
-    def change_click_int(self, new_val):
+    def change_interval(self, new_val) -> None:
         if not new_val: return
-        self.click_interval = new_val
+        try:
+            self.interval = float(new_val)
+        except ValueError:
+            error("Invalid interval", "Interval %s can not be float value. Default interval sets to 0.1 sec"%new_val)
+            self.interval = 0.1
 
-    def change_macros_int(self, new_val):
-        if not new_val: return
-        self.macros_interval = new_val
 
     def write_points(self, text, point=tk.END, with_time=True):
         if not with_time: 
-            text += CMD_SEPARATOR+self.click_interval
+            text += CMD_SEPARATOR+str(self.interval)
         self.macros.insert(point, text+"\n")
 
     def save(self):
@@ -127,13 +138,15 @@ class App(tk.Tk):
             self.write_points(three)
         f.close()
 
-    def line2cmd(self, line: str) -> [None, fn.Click, fn.Write, fn.File]:
+    def line2cmd(self, line: str) -> Union[None, fn.Click, fn.Write, fn.File, fn.Wait]:
+        if line.strip() == "": return self.funcs["wait"](full=line)
+        
         split = line.split(CMD_SEPARATOR)
         func = self.funcs.get(split[0])
         if not func:
             error("Bad function name in line", line)
             return None
-        return func(split, line)
+        return func(split, line, self.interval)
 
     def start_clicking(self):
         lines = self.macros.get("1.0", tk.END).strip().split("\n")
@@ -143,13 +156,12 @@ class App(tk.Tk):
         self.wm_state("iconic")
         time.sleep(0.5)
 
-        print("\t @Start checking")
+        print("\n\t @Start checking")
         for command in commands:
             if command.check():
                 print("@ERROR in previous line")
                 return
-        self.deiconify()
-        print("\t @Finish checking! No errors!")
+        print("\t @Finish checking! No errors!\n")
 
         for command in commands:
             command.do()
