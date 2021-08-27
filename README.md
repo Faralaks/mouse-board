@@ -39,6 +39,12 @@ It was created especially for Windows but other platforms are potentially suppor
 
 **Parameters:** path - file path. Use `.` to specify relative path.
 
+- wait - Wait some seconds
+
+`wait@sec@delay`
+
+**Parameters:** sec - seconds to wait.
+
 # Make now
 - Empty line equal `wait@0`
 - If the program cannot bring the last parameter to float, it sets the Default Delay.
