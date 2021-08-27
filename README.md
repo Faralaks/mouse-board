@@ -46,6 +46,7 @@ It was created especially for Windows but other platforms are potentially suppor
 **Parameters:** sec - seconds to wait.
 
 # Make now
+- Program output redirects to log.txt which is created next to the executable file.
 - Empty line equal `wait@0`
 - If the program cannot bring the last parameter to float, it sets the Default Delay.
 - Default Delay by default:) equal 0.1 sec but u can change it in top menu.
