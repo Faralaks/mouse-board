@@ -13,7 +13,7 @@ It was created especially for Windows but other platforms are potentially suppor
 5. Enjoy!
 
 #Language
-- There are three commands available for you now: `click`, `write` and `file`. A little later there will be more of them (See [future](#Future))
+- There are 4 commands available for you now: `click`, `write`, `file` and`wait`. A little later there will be more of them (See [future](#Future))
 - Each command begins with new line. It means that all commands are divided by newline symbol `\n`.
 - By default, parameters are divided by `@` symbol but u can change it in top menu.
 - First word in line as always command word then parameters.
@@ -40,6 +40,7 @@ It was created especially for Windows but other platforms are potentially suppor
 **Parameters:** path - file path. Use `.` to specify relative path.
 
 #Make now
+- Empty line equal `wait@0`
 - If the program cannot bring the last parameter to float, it sets the Default Delay.
 - Default Delay by default:) equal 0.1 sec but u can change it in top menu.
 - After each command the program goes to sleep (time.sleep function) for the specified delay.
@@ -50,6 +51,7 @@ It was created especially for Windows but other platforms are potentially suppor
 - If errors occur, the corresponding messages are displayed.
 
 #Examples
+- `wait@4` - Just waits 2 seconds.
 - `click@1000@500@left@0.1` - Clicks left mouse button on point (1000, 500) with delay 0.1 sec before next command.
 - `click@800@900@right@0` - Clicks right mouse button on point (800, 900) with delay 0 sec before next command.
 - `write@This is the best project in the whole world!` - pats this text with default delay before next command.
@@ -61,7 +63,6 @@ It was created especially for Windows but other platforms are potentially suppor
 In the future, I want to add some commands:
 - move - just moves cursor to point.
 - dclick - double click.
-- wait - just waits some seconds.
 - image - click on image on screen.
 - wimage - waits before image appears on screen.
 
