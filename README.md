@@ -27,13 +27,13 @@ It was created especially for Windows but other platforms are potentially suppor
 
 **Parameters:** x, y - coordinates. button - `left` or `right` means mouse button.
 
-- write - pasts text
+- write - Paste text
 
 `write@text@delay`
 
 **Parameters:** text - Some text.
 
-- file - pasts text from text file
+- file - Paste text from text file
 
 `file@path@delay`
 
@@ -48,6 +48,7 @@ It was created especially for Windows but other platforms are potentially suppor
 - Before start macros program checks it.
 - It checks the correctness of the commands, the presence of points on the screen and the existence of the specified files.
 - If errors occur, the corresponding messages are displayed.
+- Text pasts by `ctrl+v` or `commnd+v`. It means that text pasts from clipboard. If you had something in the clipboard, it will remain there.
 
 # Examples
 - `click@1000@500@left@0.1` - Clicks left mouse button on point (1000, 500) with delay 0.1 sec before next command.
