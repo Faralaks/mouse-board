@@ -12,7 +12,7 @@ It was created especially for Windows but other platforms are potentially suppor
 4. Press RUN Script button.
 5. Enjoy!
 
-#Language
+# Language
 - There are 4 commands available for you now: `click`, `write`, `file` and`wait`. A little later there will be more of them (See [future](#Future))
 - Each command begins with new line. It means that all commands are divided by newline symbol `\n`.
 - By default, parameters are divided by `@` symbol but u can change it in top menu.
@@ -20,26 +20,26 @@ It was created especially for Windows but other platforms are potentially suppor
 - Last parameter is always Delay before next command.
 - Below you can see the syntax of the commands:
 
-#Syntax
+# Syntax
 - click - Click on screen
-- 
+
 `click@x@y@button@delay`
 
 **Parameters:** x, y - coordinates. button - `left` or `right` means mouse button.
 
-- write - pasts text
+- write - Paste text
 
 `write@text@delay`
 
 **Parameters:** text - Some text.
 
-- file - pasts text from text file
+- file - Paste text from text file
 
 `file@path@delay`
 
 **Parameters:** path - file path. Use `.` to specify relative path.
 
-#Make now
+# Make now
 - Empty line equal `wait@0`
 - If the program cannot bring the last parameter to float, it sets the Default Delay.
 - Default Delay by default:) equal 0.1 sec but u can change it in top menu.
@@ -49,8 +49,9 @@ It was created especially for Windows but other platforms are potentially suppor
 - Before start macros program checks it.
 - It checks the correctness of the commands, the presence of points on the screen and the existence of the specified files.
 - If errors occur, the corresponding messages are displayed.
+- Text pasts by `ctrl+v` or `commnd+v`. It means that text pasts from clipboard. If you had something in the clipboard, it will remain there.
 
-#Examples
+# Examples
 - `wait@4` - Just waits 2 seconds.
 - `click@1000@500@left@0.1` - Clicks left mouse button on point (1000, 500) with delay 0.1 sec before next command.
 - `click@800@900@right@0` - Clicks right mouse button on point (800, 900) with delay 0 sec before next command.
@@ -59,7 +60,7 @@ It was created especially for Windows but other platforms are potentially suppor
 - `file@C:\data\file.txt` - pasts text content from file (absolute path) with default delay before next command.
 - `file@.\file.txt@22` - pasts text content from file (relative path) with 22 sec delay before next command.
 
-#Future
+# Future
 In the future, I want to add some commands:
 - move - just moves cursor to point.
 - dclick - double click.
