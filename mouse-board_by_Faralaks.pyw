@@ -15,16 +15,16 @@ from PIL import ImageTk
 import functions as fn
 
 PATH_SEPARATOR = "\\"if sys.platform=="win32" else "/"
-CMD_SEPARATOR = '@'
+CMD_SEPARATOR = '+'
 
 pag.FAILSAFE = False
 
 
 log_file = open("log.txt", "a")
 
-sys.stdout = log_file
-sys.stderr = log_file
-print("\n\n <-------------| Logging Clicker by Faralaks |-------------> \n", dt.datetime.now(), "\n")
+#sys.stdout = log_file
+#sys.stderr = log_file
+print("\n\n <-------------| Logging Mouse-Board by Faralaks v3 |-------------> \n", dt.datetime.now(), "\n")
 
 
 class About(tk.Toplevel):
@@ -74,15 +74,14 @@ class App(tk.Tk):
         self.frame = tk.Frame(self)
         self.photo = None
         self.frame.grid()
-        self.geometry("1550x550+0+-10")
-        self.title("Mouse-Board by Faralaks")
+        self.geometry("1550x620+0+-10")
+        self.title("Mouse-Board by Faralaks v3")
         icon = path.join(PATH_SEPARATOR.join(path.split(path.abspath(__file__))[:-1]), "icon.png")
 
         self.iconphoto(True, tk.PhotoImage(file=icon))
         self.bind("<Escape>", lambda event: self.destroy())
 
         self.interval = 0.1
-        self.macros_interval = "-1"
 
         self.funcs = {"click":fn.Click, "write":fn.Write, "file":fn.File, "wait":fn.Wait}
 
@@ -94,14 +93,13 @@ class App(tk.Tk):
         menu.add_command(label='Separator', command=lambda: change_separator(
             pag.prompt("Enter a new separator, for example, @ or -")))
         menu.add_command(label='Need Help?', command=lambda : browser.open("https://github.com/Faralaks/mouse-board"))
-
-
         self.config(menu=menu)
 
         tk.Button(self.frame, text="RUN Macros", command=self.start_clicking).grid(row=0, column=0)
         tk.Button(self.frame, text="ScreenShot", command=self.open_window).grid(row=0, column=1)
         tk.Button(self.frame, text="Find File", command=self.get_file_path).grid(row=0, column=2)
         self.macros = tk.Text(self.frame, height=25, width=154, wrap=tk.WORD)
+        self.macros.configure(font=("Trebuchet MS", 10, "bold"))
         self.macros.grid(row=3, column=0, columnspan=10)
 
 
@@ -114,7 +112,7 @@ class App(tk.Tk):
             self.interval = 0.1
 
 
-    def write_points(self, text, point=tk.END, with_time=True):
+    def write_cmd(self, text, point=tk.END, with_time=True):
         if not with_time: 
             text += CMD_SEPARATOR+str(self.interval)
         self.macros.insert(point, text+"\n")
@@ -130,7 +128,7 @@ class App(tk.Tk):
     def get_file_path(self):
         file = askopenfilename(initialdir=os.getcwd(), filetypes = (("Text files","*.txt*"), ("All files", "*.*")))
         if not file: return
-        self.write_points(file.replace("/", PATH_SEPARATOR), point=tk.INSERT, with_time=False)
+        self.write_cmd(file.replace("/", PATH_SEPARATOR), point=tk.INSERT, with_time=False)
 
     def load(self):
         self.macros.delete(1.0, tk.END)
@@ -138,7 +136,7 @@ class App(tk.Tk):
         #if not f: return
         points = f.read().strip().split("\n")
         for three in points:
-            self.write_points(three)
+            self.write_cmd(three)
         f.close()
 
     def line2cmd(self, line: str) -> Union[None, fn.Click, fn.Write, fn.File, fn.Wait]:
@@ -175,7 +173,7 @@ class App(tk.Tk):
         self.wm_state("iconic")
         time.sleep(0.5)
         self.photo = pag.screenshot()
-        about = About(self, self.photo, self.write_points)
+        about = About(self, self.photo, self.write_cmd)
         about.grab_set()
 
 
