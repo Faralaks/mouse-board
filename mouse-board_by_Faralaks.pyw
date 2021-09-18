@@ -82,7 +82,12 @@ class App(tk.Tk):
 
         self.interval = 0.1
 
-        self.funcs = {"click":fn.Click, "dclick":fn.Dclick, "move":fn.Move, "moveto":fn.Moveto, "write":fn.Write, "file":fn.File, "wait":fn.Wait, "press":fn.Press}
+        self.funcs = {"click":fn.Click, "dclick":fn.Dclick,
+                      "move":fn.Move, "moveto":fn.Moveto,
+                      "write":fn.Write, "file":fn.File,
+                      "wait":fn.Wait,
+                      "press":fn.Press,
+                      "cimage":fn.Cimage,"dimage":fn.Dimage}
 
         menu = tk.Menu(self)
         menu.add_command(label='Open', command=self.load)
@@ -125,9 +130,9 @@ class App(tk.Tk):
         f.close()
 
     def get_file_path(self):
-        file = askopenfilename(initialdir=os.getcwd(), filetypes = (("Text files","*.txt*"), ("All files", "*.*")))
+        file = askopenfilename(initialdir=os.getcwd())
         if not file: return
-        self.write_cmd(file.replace("/", PATH_SEPARATOR), point=tk.INSERT, with_time=False)
+        self.write_cmd(file.replace("/", PATH_SEPARATOR), point=tk.INSERT, with_time=True)
 
     def load(self):
         self.macros.delete(1.0, tk.END)
@@ -138,7 +143,7 @@ class App(tk.Tk):
             self.write_cmd(three)
         f.close()
 
-    def line2cmd(self, line: str) -> Union[None, fn.Click, fn.Write, fn.File, fn.Wait, fn.Dclick, fn.Move, fn.Moveto, fn.Press]:
+    def line2cmd(self, line: str) -> Union[None, fn.Command]:
         if line.strip() == "": return self.funcs["wait"](full=line)
         
         split = line.split(CMD_SEPARATOR)
@@ -168,7 +173,6 @@ class App(tk.Tk):
             time.sleep(command.i)
 
         print("\t@Macros DONE!")
-        self.deiconify()
 
 
     def open_window(self):

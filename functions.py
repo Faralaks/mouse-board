@@ -35,6 +35,9 @@ class Command:
     def log_call(self, add="") -> None:
         print(dt.datetime.now(), self.__repr__()+" "+add)
 
+    def do(self): pass
+    def check(self): pass
+
 
 class Click(Command):
     x = 0
@@ -193,3 +196,56 @@ class Press(Command):
                 error("Oh! Bad Key parameter in line", self.full+"\nBad Key is "+key)
                 return True
         return False
+
+
+class Dimage(Command):
+    file_path = ""
+    confidence = 0.9
+
+    def __init__(self, split: list, full: str, interval: float) -> None:
+        super().__init__(split, full, interval)
+        self.file_path = path.abspath(self.params[0]) if self.params[0][0] == "." else self.params[0]
+        self.confidence = float(self.params[1])
+
+    def do(self) -> None:
+        self.log_call(add="file_path: " + self.file_path)
+        x, y = pag.locateCenterOnScreen(self.file_path, confidence=self.confidence)
+        print("   Try to double click on (%s, %s)" % (x, y))
+        pag.click(x, y, 2, 0.01, "left")
+
+    def check(self) -> bool:
+        self.log_call(add="file_path: " + self.file_path)
+        if not path.exists(self.file_path):
+            error("No such path like in line", self.full)
+            return True
+        return False
+
+
+class Cimage(Command):
+    file_path = ""
+    confidence = 0.0
+    btn = ""
+
+    def __init__(self, split: list, full: str, interval: float) -> None:
+        super().__init__(split, full, interval)
+        self.file_path = path.abspath(self.params[0]) if self.params[0][0] == "." else self.params[0]
+        self.confidence = float(self.params[1])
+        self.btn = self.params[2]
+
+    def do(self) -> None:
+        self.log_call(add="file_path: " + self.file_path)
+        x, y = pag.locateCenterOnScreen(self.file_path, confidence=self.confidence)
+        print("   Try to click on (%s, %s)"%(x ,y))
+        pag.click(x, y, 1, 0, self.btn)
+
+
+    def check(self) -> bool:
+        self.log_call(add="file_path: " + self.file_path)
+        if not path.exists(self.file_path):
+            error("No such path like in line", self.full)
+            return True
+        if self.btn != "left" and self.btn != "right":
+            error("Oh! Wrong button in line", self.full+"\nBad Btn is "+self.btn)
+            return True
+        return False
+
