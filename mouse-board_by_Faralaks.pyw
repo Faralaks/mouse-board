@@ -87,7 +87,8 @@ class App(tk.Tk):
                       "write":fn.Write, "file":fn.File,
                       "wait":fn.Wait,
                       "press":fn.Press,
-                      "cimage":fn.Cimage,"dimage":fn.Dimage}
+                      "cimage":fn.Cimage,"dimage":fn.Dimage,"aimage":fn.Aimage,
+                      }
 
         menu = tk.Menu(self)
         menu.add_command(label='Open', command=self.load)

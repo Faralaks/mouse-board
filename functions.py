@@ -1,4 +1,5 @@
 import sys
+import time
 
 import pyautogui as pag
 import pyperclip as clipboard
@@ -200,7 +201,7 @@ class Press(Command):
 
 class Dimage(Command):
     file_path = ""
-    confidence = 0.9
+    confidence = 0.0
 
     def __init__(self, split: list, full: str, interval: float) -> None:
         super().__init__(split, full, interval)
@@ -249,3 +250,48 @@ class Cimage(Command):
             return True
         return False
 
+
+class Aimage(Command):
+    file_path = ""
+    confidence = 0.0
+    btn = ""
+    clicks = 0
+    click_i = 0
+    find_i = 0
+
+    def __init__(self, split: list, full: str, interval: float) -> None:
+        super().__init__(split, full, interval)
+        self.file_path = path.abspath(self.params[0]) if self.params[0][0] == "." else self.params[0]
+        self.confidence = float(self.params[1])
+        self.btn = self.params[2]
+        self.clicks, self.click_i, self.find_i = int(self.params[3]), float(self.params[4]), float(self.params[5])
+
+
+    def do(self) -> None:
+        self.log_call(add="file_path: " + self.file_path)
+        positions = list(pag.locateAllOnScreen(self.file_path, confidence=self.confidence))
+        print(len(positions), positions)
+        for pos in positions:
+            x, y = pag.center(pos)
+            print("   Try to click on (%s, %s) with %s btn" % (x, y, self.btn))
+            pag.click(x, y, self.clicks, self.click_i, self.btn)
+            time.sleep(self.find_i)
+
+    def check(self) -> bool:
+        self.log_call(add="file_path: " + self.file_path)
+        if not path.exists(self.file_path):
+            error("No such path like in line", self.full)
+            return True
+        if self.btn != "left" and self.btn != "right":
+            error("Oh! Wrong button in line", self.full+"\nBad Btn is "+self.btn)
+            return True
+        if self.clicks < 1:
+            error("Oh! Wrong clicks count in line", self.full+"\nBad Count is "+str(self.clicks))
+            return True
+        if self.click_i < 0:
+            error("Oh! Wrong interval between clicks in line", self.full+"\nBad Click Interval is "+str(self.click_i))
+            return True
+        if self.find_i < 0:
+            error("Oh! Wrong  interval between finding picture in line", self.full+"\nBad Find Interval is "+str(self.find_i))
+            return True
+        return False
