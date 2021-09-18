@@ -104,3 +104,23 @@ class Wait(Command):
     def check(self) -> bool:
         self.log_call()
         return False
+
+
+class Dclick(Command):
+    x = 0
+    y = 0
+
+    def __init__(self, split: list, full: str, interval: float) -> None:
+        super().__init__(split, full, interval)
+        self.x, self.y = int(self.params[0]), int(self.params[1])
+
+    def do(self) -> None:
+        self.log_call()
+        pag.click(self.x, self.y, 2, 0.01, "left")
+
+    def check(self) -> bool:
+        self.log_call()
+        if not pag.onScreen(self.x, self.y):
+            error("Oh! Wrong point in line", self.full)
+            return True
+        return False

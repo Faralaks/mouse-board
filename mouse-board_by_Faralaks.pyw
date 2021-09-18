@@ -56,7 +56,6 @@ class About(tk.Toplevel):
         self.destroy()
 
     def click(self, event: tk.Event):
-        print(type(event))
         self.write("click"+CMD_SEPARATOR+"%s%s%s%s%s"%(
             event.x, CMD_SEPARATOR, event.y, CMD_SEPARATOR, "right" if event.num==3 else "left"), with_time=False)
 
@@ -83,7 +82,7 @@ class App(tk.Tk):
 
         self.interval = 0.1
 
-        self.funcs = {"click":fn.Click, "write":fn.Write, "file":fn.File, "wait":fn.Wait}
+        self.funcs = {"click":fn.Click, "dclick":fn.Dclick, "write":fn.Write, "file":fn.File, "wait":fn.Wait}
 
         menu = tk.Menu(self)
         menu.add_command(label='Open', command=self.load)
@@ -139,7 +138,7 @@ class App(tk.Tk):
             self.write_cmd(three)
         f.close()
 
-    def line2cmd(self, line: str) -> Union[None, fn.Click, fn.Write, fn.File, fn.Wait]:
+    def line2cmd(self, line: str) -> Union[None, fn.Click, fn.Write, fn.File, fn.Wait, fn.Dclick]:
         if line.strip() == "": return self.funcs["wait"](full=line)
         
         split = line.split(CMD_SEPARATOR)
