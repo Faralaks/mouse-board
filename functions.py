@@ -124,3 +124,47 @@ class Dclick(Command):
             error("Oh! Wrong point in line", self.full)
             return True
         return False
+
+class Move(Command):
+    x = 0
+    y = 0
+    slow = 0
+
+    def __init__(self, split: list, full: str, interval: float) -> None:
+        super().__init__(split, full, interval)
+        self.x, self.y, self.slow = int(self.params[0]), int(self.params[1]), int(self.params[2])
+
+    def do(self) -> None:
+        self.log_call()
+        pag.move(self.x, self.y, self.slow)
+
+    def check(self) -> bool:
+        self.log_call()
+        if self.slow < 0:
+            error("Oh! Bad Slow parameter in line", self.full)
+            return True
+        return False
+
+
+class Moveto(Command):
+    x = 0
+    y = 0
+    slow = 0
+
+    def __init__(self, split: list, full: str, interval: float) -> None:
+        super().__init__(split, full, interval)
+        self.x, self.y, self.slow = int(self.params[0]), int(self.params[1]), int(self.params[2])
+
+    def do(self) -> None:
+        self.log_call()
+        pag.moveTo(self.x, self.y, self.slow)
+
+    def check(self) -> bool:
+        self.log_call()
+        if not pag.onScreen(self.x, self.y):
+            error("Oh! Wrong point in line", self.full)
+            return True
+        if self.slow < 0:
+            error("Oh! Bad Slow parameter in line", self.full)
+            return True
+        return False
