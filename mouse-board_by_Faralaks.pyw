@@ -170,7 +170,11 @@ class App(tk.Tk):
         print("\t @Finish checking! No errors!\n")
 
         for command in commands:
-            command.do()
+            try:
+                command.do()
+            except Exception as e:
+                print("\t@Error while doing macros!: %s"%e)
+                return
             time.sleep(command.i)
 
         print("\t@Macros DONE!")

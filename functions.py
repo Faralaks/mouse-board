@@ -210,7 +210,9 @@ class Dimage(Command):
 
     def do(self) -> None:
         self.log_call(add="file_path: " + self.file_path)
-        x, y = pag.locateCenterOnScreen(self.file_path, confidence=self.confidence)
+        pos = pag.locateCenterOnScreen(self.file_path, confidence=self.confidence)
+        if not pos: raise Exception("No such image on screen")
+        x, y = pos[0], pos[1]
         print("   Try to double click on (%s, %s)" % (x, y))
         pag.click(x, y, 2, 0.01, "left")
 
@@ -226,18 +228,23 @@ class Cimage(Command):
     file_path = ""
     confidence = 0.0
     btn = ""
+    clicks = 0
+    click_i = 0
 
     def __init__(self, split: list, full: str, interval: float) -> None:
         super().__init__(split, full, interval)
         self.file_path = path.abspath(self.params[0]) if self.params[0][0] == "." else self.params[0]
         self.confidence = float(self.params[1])
-        self.btn = self.params[2]
+        self.btn, self.clicks, self.click_i = self.params[2], int(self.params[3]), float(self.params[4])
+
 
     def do(self) -> None:
         self.log_call(add="file_path: " + self.file_path)
-        x, y = pag.locateCenterOnScreen(self.file_path, confidence=self.confidence)
+        pos = pag.locateCenterOnScreen(self.file_path, confidence=self.confidence)
+        if not pos: raise Exception("No such image on screen")
+        x, y = pos[0], pos[1]
         print("   Try to click on (%s, %s)"%(x ,y))
-        pag.click(x, y, 1, 0, self.btn)
+        pag.click(x, y, self.clicks, self.click_i, self.btn)
 
 
     def check(self) -> bool:
