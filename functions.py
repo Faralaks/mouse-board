@@ -270,7 +270,6 @@ class Aimage(Command):
     def do(self) -> None:
         self.log_call(add="file_path: " + self.file_path)
         positions = list(pag.locateAllOnScreen(self.file_path, confidence=self.confidence))
-        print(len(positions), positions)
         for pos in positions:
             x, y = pag.center(pos)
             print("   Try to click on (%s, %s) with %s btn" % (x, y, self.btn))
@@ -293,5 +292,32 @@ class Aimage(Command):
             return True
         if self.find_i < 0:
             error("Oh! Wrong  interval between finding picture in line", self.full+"\nBad Find Interval is "+str(self.find_i))
+            return True
+        return False
+
+
+
+class Wimage(Command):
+    file_path = ""
+    confidence = 0.0
+    round_i = 0
+    max_wait = 0
+
+    def __init__(self, split: list, full: str, interval: float) -> None:
+        super().__init__(split, full, interval)
+        self.file_path = path.abspath(self.params[0]) if self.params[0][0] == "." else self.params[0]
+        self.confidence, self.round_i, self.max_wait = float(self.params[1]), float(self.params[2]), int(self.params[3])
+
+    def do(self) -> None:
+        self.log_call(add="file_path: " + self.file_path)
+        while True:
+            pos = pag.locateOnScreen(self.file_path, confidence=self.confidence)
+            if pos: break
+            time.sleep(self.round_i)
+
+    def check(self) -> bool:
+        self.log_call(add="file_path: " + self.file_path)
+        if not path.exists(self.file_path):
+            error("No such path like in line", self.full)
             return True
         return False
