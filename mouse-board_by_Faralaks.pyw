@@ -82,7 +82,7 @@ class App(tk.Tk):
 
         self.interval = 0.1
 
-        self.funcs = {"click":fn.Click, "dclick":fn.Dclick, "move":fn.Move, "moveto":fn.Moveto, "write":fn.Write, "file":fn.File, "wait":fn.Wait}
+        self.funcs = {"click":fn.Click, "dclick":fn.Dclick, "move":fn.Move, "moveto":fn.Moveto, "write":fn.Write, "file":fn.File, "wait":fn.Wait, "press":fn.Press}
 
         menu = tk.Menu(self)
         menu.add_command(label='Open', command=self.load)
@@ -138,7 +138,7 @@ class App(tk.Tk):
             self.write_cmd(three)
         f.close()
 
-    def line2cmd(self, line: str) -> Union[None, fn.Click, fn.Write, fn.File, fn.Wait, fn.Dclick, fn.Move, fn.Moveto]:
+    def line2cmd(self, line: str) -> Union[None, fn.Click, fn.Write, fn.File, fn.Wait, fn.Dclick, fn.Move, fn.Moveto, fn.Press]:
         if line.strip() == "": return self.funcs["wait"](full=line)
         
         split = line.split(CMD_SEPARATOR)

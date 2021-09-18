@@ -16,6 +16,7 @@ class Command:
     cmd = ""
     params = None
     i = 0
+    no_i = False
     full = ""
 
     def __init__(self, split: list, full: str, interval: float) -> None:
@@ -26,6 +27,7 @@ class Command:
             self.i = float(split[-1])
         except ValueError:
             self.i = interval
+            self.no_i = True
 
     def __repr__(self) -> str:
         return "cmd: %s, params: %s, i: %d"%(self.cmd, self.params, self.i)
@@ -165,6 +167,29 @@ class Moveto(Command):
             error("Oh! Wrong point in line", self.full)
             return True
         if self.slow < 0:
-            error("Oh! Bad Slow parameter in line", self.full)
+            error("Oh! Bad Slow parameter in line", self.full+"\nBad Slow is "+str(self.slow))
             return True
+        return False
+
+
+class Press(Command):
+    keys = []
+
+    def __init__(self, split: list, full: str, interval: float) -> None:
+        super().__init__(split, full, interval)
+        self.keys = self.params if self.no_i else self.params[:-1]
+
+    def do(self) -> None:
+        self.log_call()
+        for key in self.keys:
+            pag.keyDown(key)
+        for key in self.keys[::-1]:
+            pag.keyUp(key)
+
+    def check(self) -> bool:
+        self.log_call()
+        for key in self.keys[::-1]:
+            if key not in pag.KEYBOARD_KEYS:
+                error("Oh! Bad Key parameter in line", self.full+"\nBad Key is "+key)
+                return True
         return False
