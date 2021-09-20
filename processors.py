@@ -1,5 +1,5 @@
 from os import path
-
+from pyautogui import KEYBOARD_KEYS
 from errors import *
 
 
@@ -38,7 +38,11 @@ def proc_f_gt0_val(val: str) -> float:
     if val < 0: raise ValLT0Error("Float value lower then zero'")
     return val
 
-
-
-
+def proc_keys(keys: str) -> list:
+    try: keys = keys.split()
+    except Exception as e: raise UnknownError("Can't process keys string | %s"%e)
+    for key in keys:
+            if key not in KEYBOARD_KEYS:
+                raise BadKeyError("Key %s not available"%key)
+    return keys
 

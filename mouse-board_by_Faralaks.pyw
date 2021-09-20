@@ -102,6 +102,7 @@ class App(tk.Tk):
             "time":pc.proc_f_gt0_val,
             "relative_x":pc.proc_rel_val,
             "relative_y":pc.proc_rel_val,
+            "keys":pc.proc_keys,
         }
 
         menu = tk.Menu(self)

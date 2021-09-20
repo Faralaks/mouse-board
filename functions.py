@@ -139,31 +139,22 @@ class Moveto(Command):
 
     def do(self) -> None:
         self.log_call()
-        pag.moveTo(self.x, self.y, self.time)
-
+        try: pag.moveTo(self.x, self.y, self.time)
+        except Exception as e: raise UnknownError("Error while doing command: %s" % e)
 
 class Press(Command):
     keys = []
-
-    def __init__(self, split: list, full: str, interval: float) -> None:
-        super().__init__(split, full, interval)
-        self.keys = self.params if self.no_i else self.params[:-1]
+    def __init__(self, split: list, full: str, interval: float, param_names: tuple) -> None:
+        super().__init__(split, full, interval, param_names)
 
     def do(self) -> None:
         self.log_call()
-        for key in self.keys:
-            pag.keyDown(key)
-        for key in self.keys[::-1]:
-            pag.keyUp(key)
-
-    def check(self) -> bool:
-        self.log_call()
-        for key in self.keys[::-1]:
-            if key not in pag.KEYBOARD_KEYS:
-                error("Oh! Bad Key parameter in line", self.full+"\nBad Key is "+key)
-                return True
-        return False
-
+        try:
+            for key in self.keys:
+                pag.keyDown(key)
+            for key in self.keys[::-1]:
+                pag.keyUp(key)
+        except Exception as e: raise UnknownError("Error while doing command: %s" % e)
 
 class Dimage(Command):
     file_path = ""
