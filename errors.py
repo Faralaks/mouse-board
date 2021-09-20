@@ -21,3 +21,6 @@ class BadKeyError(Error):
 class BadConfidenceError(Error):
     pass
 
+class TimeLimitReachedError(Error):
+    pass
+

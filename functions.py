@@ -156,6 +156,7 @@ class Press(Command):
                 pag.keyUp(key)
         except Exception as e: raise UnknownError("Error while doing command: %s" % e)
 
+
 class Dimage(Command):
     file_path, confidence = "", 0.0
     def __init__(self, split: list, full: str, interval: float, param_names: tuple) -> None:
@@ -171,109 +172,52 @@ class Dimage(Command):
             pag.click(x, y, 2, 0.01, "left")
         except Exception as e: raise UnknownError("Error while doing command: %s" % e)
 
-
-
 class Cimage(Command):
-    file_path = ""
-    confidence = 0.0
-    btn = ""
-    clicks = 0
-    click_i = 0
-
-    def __init__(self, split: list, full: str, interval: float) -> None:
-        super().__init__(split, full, interval)
-        self.file_path = path.abspath(self.params[0]) if self.params[0][0] == "." else self.params[0]
-        self.confidence = float(self.params[1])
-        self.btn, self.clicks, self.click_i = self.params[2], int(self.params[3]), float(self.params[4])
-
+    file_path, btn, confidence, clicks_interval, clicks_count = "", "", 0.0, 0.0, 0
+    def __init__(self, split: list, full: str, interval: float, param_names: tuple) -> None:
+        super().__init__(split, full, interval, param_names)
 
     def do(self) -> None:
-        self.log_call(add="file_path: " + self.file_path)
-        pos = pag.locateCenterOnScreen(self.file_path, confidence=self.confidence)
-        if not pos: raise Exception("No such image on screen")
-        x, y = pos[0], pos[1]
-        print("   Try to click on (%s, %s)"%(x ,y))
-        pag.click(x, y, self.clicks, self.click_i, self.btn)
-
-
-    def check(self) -> bool:
-        self.log_call(add="file_path: " + self.file_path)
-        if not path.exists(self.file_path):
-            error("No such path like in line", self.full)
-            return True
-        if self.btn != "left" and self.btn != "right":
-            error("Oh! Wrong button in line", self.full+"\nBad Btn is "+self.btn)
-            return True
-        return False
+        try:
+            self.log_call(add="file_path: " + self.file_path)
+            pos = pag.locateCenterOnScreen(self.file_path, confidence=self.confidence)
+            if not pos: raise Exception("No such image on screen")
+            x, y = pos[0], pos[1]
+            print("   - Try to click on (%s, %s) with %s btn "%(x ,y, self.btn))
+            pag.click(x, y, self.clicks_count, self.clicks_interval, self.btn)
+        except Exception as e: raise UnknownError("Error while doing command: %s" % e)
 
 
 class Aimage(Command):
-    file_path = ""
-    confidence = 0.0
-    btn = ""
-    clicks = 0
-    click_i = 0
-    find_i = 0
-
-    def __init__(self, split: list, full: str, interval: float) -> None:
-        super().__init__(split, full, interval)
-        self.file_path = path.abspath(self.params[0]) if self.params[0][0] == "." else self.params[0]
-        self.confidence = float(self.params[1])
-        self.btn = self.params[2]
-        self.clicks, self.click_i, self.find_i = int(self.params[3]), float(self.params[4]), float(self.params[5])
-
+    file_path, btn, confidence, clicks_interval, find_interval, clicks_count = "", "", 0.0, 0.0, 0.0, 0
+    def __init__(self, split: list, full: str, interval: float, param_names: tuple) -> None:
+        super().__init__(split, full, interval, param_names)
 
     def do(self) -> None:
         self.log_call(add="file_path: " + self.file_path)
-        positions = list(pag.locateAllOnScreen(self.file_path, confidence=self.confidence))
-        for pos in positions:
-            x, y = pag.center(pos)
-            print("   Try to click on (%s, %s) with %s btn" % (x, y, self.btn))
-            pag.click(x, y, self.clicks, self.click_i, self.btn)
-            time.sleep(self.find_i)
-
-    def check(self) -> bool:
-        self.log_call(add="file_path: " + self.file_path)
-        if not path.exists(self.file_path):
-            error("No such path like in line", self.full)
-            return True
-        if self.btn != "left" and self.btn != "right":
-            error("Oh! Wrong button in line", self.full+"\nBad Btn is "+self.btn)
-            return True
-        if self.clicks < 1:
-            error("Oh! Wrong clicks count in line", self.full+"\nBad Count is "+str(self.clicks))
-            return True
-        if self.click_i < 0:
-            error("Oh! Wrong interval between clicks in line", self.full+"\nBad Click Interval is "+str(self.click_i))
-            return True
-        if self.find_i < 0:
-            error("Oh! Wrong  interval between finding picture in line", self.full+"\nBad Find Interval is "+str(self.find_i))
-            return True
-        return False
-
-
+        try:
+            positions = list(pag.locateAllOnScreen(self.file_path, confidence=self.confidence))
+            print("   - %s matches were found with the image!"%len(positions))
+            for pos in positions:
+                x, y = pag.center(pos)
+                print("   - Try to click on (%s, %s) with %s btn" % (x, y, self.btn))
+                pag.click(x, y, self.clicks_count, self.clicks_interval, self.btn)
+                time.sleep(self.find_interval)
+        except Exception as e: raise UnknownError("Error while doing command: %s" % e)
 
 class Wimage(Command):
-    file_path = ""
-    confidence = 0.0
-    round_i = 0
-    max_wait = 0
-
-    def __init__(self, split: list, full: str, interval: float) -> None:
-        super().__init__(split, full, interval)
-        self.file_path = path.abspath(self.params[0]) if self.params[0][0] == "." else self.params[0]
-        self.confidence, self.round_i, self.max_wait = float(self.params[1]), float(self.params[2]), int(self.params[3])
+    file_path, confidence, find_interval, time_limit = "", 0.0, 0.0, 0
+    def __init__(self, split: list, full: str, interval: float, param_names: tuple) -> None:
+        super().__init__(split, full, interval, param_names)
 
     def do(self) -> None:
         self.log_call(add="file_path: " + self.file_path)
-        while True:
-            pos = pag.locateOnScreen(self.file_path, confidence=self.confidence)
-            if pos: break
-            time.sleep(self.round_i)
+        try:
+            start_time = dt.datetime.now()
+            while True:
+                pos = pag.locateOnScreen(self.file_path, confidence=self.confidence)
+                if pos: break
+                time.sleep(self.find_interval)
+                if (dt.datetime.now() - start_time).seconds > self.time_limit: raise TimeLimitReachedError("Image was not found for given time")
+        except Exception as e: raise UnknownError("Error while doing command: %s" % e)
 
-    def check(self) -> bool:
-        self.log_call(add="file_path: " + self.file_path)
-        if not path.exists(self.file_path):
-            error("No such path like in line", self.full)
-            return True
-        return False

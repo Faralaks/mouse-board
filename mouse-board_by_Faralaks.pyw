@@ -90,15 +90,21 @@ class App(tk.Tk):
                       "file":(fn.File, ("file_path",)),
                       "wait":(fn.Wait, ()),
                       "press":(fn.Press, ("keys",)),
-                      "cimage":(fn.Cimage, ()),"dimage":(fn.Dimage, ("file_path", "confidence")),"aimage":(fn.Aimage, ()), "wimage":(fn.Wimage, ())
+                      "cimage":(fn.Cimage, ("file_path", "confidence", "btn", "clicks_count", "clicks_interval")),
+                      "aimage":(fn.Aimage, ("file_path", "confidence", "btn", "clicks_count", "clicks_interval", "find_interval")),
+                      "dimage":(fn.Dimage, ("file_path", "confidence")),  "wimage":(fn.Wimage, ("file_path", "confidence", "find_interval", "time_limit"))
                       }
 
         self.param_processors = {
             "file_path":pc.proc_file_path,
             "x":pc.proc_i_gt0_val,
             "y":pc.proc_i_gt0_val,
+            "clicks_count":pc.proc_i_gt0_val,
+            "time_limit":pc.proc_i_gt0_val,
             "btn":pc.proc_btn_val,
             "text":pc.no_proc,
+            "clicks_interval":pc.proc_f_gt0_val,
+            "find_interval":pc.proc_f_gt0_val,
             "time":pc.proc_f_gt0_val,
             "relative_x":pc.proc_rel_val,
             "relative_y":pc.proc_rel_val,
