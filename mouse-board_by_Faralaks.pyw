@@ -90,7 +90,7 @@ class App(tk.Tk):
                       "file":(fn.File, ("file_path",)),
                       "wait":(fn.Wait, ()),
                       "press":(fn.Press, ("keys",)),
-                      "cimage":(fn.Cimage, ()),"dimage":(fn.Dimage, ()),"aimage":(fn.Aimage, ()), "wimage":(fn.Wimage, ())
+                      "cimage":(fn.Cimage, ()),"dimage":(fn.Dimage, ("file_path", "confidence")),"aimage":(fn.Aimage, ()), "wimage":(fn.Wimage, ())
                       }
 
         self.param_processors = {
@@ -103,6 +103,7 @@ class App(tk.Tk):
             "relative_x":pc.proc_rel_val,
             "relative_y":pc.proc_rel_val,
             "keys":pc.proc_keys,
+            "confidence":pc.proc_confidence,
         }
 
         menu = tk.Menu(self)

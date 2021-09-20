@@ -38,6 +38,12 @@ def proc_f_gt0_val(val: str) -> float:
     if val < 0: raise ValLT0Error("Float value lower then zero'")
     return val
 
+def proc_confidence(conf: str) -> float:
+    try: conf = float(conf)
+    except Exception as e: raise UnknownError("Can't process confidence value | %s"%e)
+    if not (0.0 <= conf <= 1.0): raise BadConfidenceError("Confidence value %s not in between 0 and 1'" % conf)
+    return conf
+
 def proc_keys(keys: str) -> list:
     try: keys = keys.split()
     except Exception as e: raise UnknownError("Can't process keys string | %s"%e)

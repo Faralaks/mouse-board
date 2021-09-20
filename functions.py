@@ -89,7 +89,7 @@ class Dclick(Command):
     def do(self) -> None:
         self.log_call()
         try:
-            pag.click(self.x, self.y, 2, 0.1, "left")
+            pag.click(self.x, self.y, 2, 0.01, "left")
         except Exception as e:
             raise UnknownError("Error while doing command: %s" % e)
 
@@ -157,28 +157,20 @@ class Press(Command):
         except Exception as e: raise UnknownError("Error while doing command: %s" % e)
 
 class Dimage(Command):
-    file_path = ""
-    confidence = 0.0
-
-    def __init__(self, split: list, full: str, interval: float) -> None:
-        super().__init__(split, full, interval)
-        self.file_path = path.abspath(self.params[0]) if self.params[0][0] == "." else self.params[0]
-        self.confidence = float(self.params[1])
+    file_path, confidence = "", 0.0
+    def __init__(self, split: list, full: str, interval: float, param_names: tuple) -> None:
+        super().__init__(split, full, interval, param_names)
 
     def do(self) -> None:
-        self.log_call(add="file_path: " + self.file_path)
-        pos = pag.locateCenterOnScreen(self.file_path, confidence=self.confidence)
-        if not pos: raise Exception("No such image on screen")
-        x, y = pos[0], pos[1]
-        print("   Try to double click on (%s, %s)" % (x, y))
-        pag.click(x, y, 2, 0.01, "left")
+        try:
+            self.log_call(add="file_path: " + self.file_path)
+            pos = pag.locateCenterOnScreen(self.file_path, confidence=self.confidence)
+            if not pos: raise Exception("No such image on screen")
+            x, y = pos[0], pos[1]
+            print("   - Try to double click on (%s, %s)" % (x, y))
+            pag.click(x, y, 2, 0.01, "left")
+        except Exception as e: raise UnknownError("Error while doing command: %s" % e)
 
-    def check(self) -> bool:
-        self.log_call(add="file_path: " + self.file_path)
-        if not path.exists(self.file_path):
-            error("No such path like in line", self.full)
-            return True
-        return False
 
 
 class Cimage(Command):

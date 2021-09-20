@@ -18,3 +18,6 @@ class ValLT0Error(Error):
 class BadKeyError(Error):
     pass
 
+class BadConfidenceError(Error):
+    pass
+
