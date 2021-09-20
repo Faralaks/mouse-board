@@ -84,7 +84,7 @@ class App(tk.Tk):
 
         self.interval = 0.1
 
-        self.funcs = {"click":fn.Click, "dclick":fn.Dclick,
+        self.funcs = {"click":(fn.Click, ("x", "y", "btn")), "dclick":(fn.Dclick, ("x", "y")),
                       "move":fn.Move, "moveto":fn.Moveto,
                       "write":fn.Write,
                       "file":(fn.File, ("file_path",)),
@@ -95,6 +95,9 @@ class App(tk.Tk):
 
         self.param_processors = {
             "file_path":pc.proc_file_path,
+            "x":pc.proc_x_val,
+            "y":pc.proc_y_val,
+            "btn":pc.proc_btn_val,
         }
 
         menu = tk.Menu(self)

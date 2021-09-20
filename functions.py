@@ -49,11 +49,14 @@ class Command:
     def do(self): pass
 
     def check(self, processors: dict) -> None:
+        print("---", self.full)
         for num, param in enumerate(self.param_names):
             processor = processors.get(param)
             if not processor: NoProcessorError("No processor for parameter name %s"%param)
+            print(">", param, self.params[num], num)
             try:
-                self.processed[param] = processor(self.params[num])
+                res = processor(self.params[num])
+                setattr(self, param, res)
             except Error as e:
                 raise Error("Err: %s\nLine: %s"%(e, self.full))
 
@@ -66,24 +69,29 @@ class Click(Command):
     y = 0
     btn = ""
 
-
-    def __init__(self, split: list, full: str, interval: float) -> None:
-        super().__init__(split, full, interval)
-        self.x, self.y, self.btn = int(self.params[0]), int(self.params[1]), self.params[2]
+    def __init__(self, split: list, full: str, interval: float, param_names: tuple) -> None:
+        super().__init__(split, full, interval, param_names)
                 
     def do(self) -> None:
         self.log_call()
-        pag.click(self.x, self.y, 1, 0, self.btn)
+        try:
+            pag.click(self.x, self.y, 1, 0, self.btn)
+        except Exception as e:
+            raise UnknownError("Error while doing command: %s" % e)
 
-    def check(self) -> bool:
+
+class Dclick(Command):
+    x, y = 0, 0
+
+    def __init__(self, split: list, full: str, interval: float, param_names: tuple) -> None:
+        super().__init__(split, full, interval, param_names)
+
+    def do(self) -> None:
         self.log_call()
-        if not pag.onScreen(self.x, self.y):
-            error("Oh! Wrong point in line", self.full)
-            return True
-        if self.btn != "left" and self.btn != "right":
-            error("Oh! Wrong button in line", self.full)
-            return True
-        return False
+        try:
+            pag.click(self.x, self.y, 2, 0.1, "left")
+        except Exception as e:
+            raise UnknownError("Error while doing command: %s" % e)
 
 
 class Write(Command):
@@ -106,12 +114,15 @@ class File(Command):
 
     def __init__(self, split: list, full: str, interval: float, param_names: tuple) -> None:
         super().__init__(split, full, interval, param_names)
-        self.file_path = path.abspath(self.params[0]) if self.params[0][0] == "." else self.params[0]
-                
+
     def do(self) -> None:
-        self.log_call(add="file_path: "+self.file_path)
-        with open(self.file_path, "r") as f:
-            paste_text(f.read())
+        self.log_call(add="file_path: " + self.file_path)
+        try:
+            with open(self.file_path, "r") as f:
+                paste_text(f.read())
+        except Exception as e:
+            raise UnknownError("Error while doing command: %s"%e)
+
 
 
 class Wait(Command):
@@ -125,25 +136,6 @@ class Wait(Command):
         self.log_call()
         return False
 
-
-class Dclick(Command):
-    x = 0
-    y = 0
-
-    def __init__(self, split: list, full: str, interval: float) -> None:
-        super().__init__(split, full, interval)
-        self.x, self.y = int(self.params[0]), int(self.params[1])
-
-    def do(self) -> None:
-        self.log_call()
-        pag.click(self.x, self.y, 2, 0.01, "left")
-
-    def check(self) -> bool:
-        self.log_call()
-        if not pag.onScreen(self.x, self.y):
-            error("Oh! Wrong point in line", self.full)
-            return True
-        return False
 
 class Move(Command):
     x = 0

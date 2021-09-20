@@ -8,3 +8,7 @@ class NoProcessorError(Error):
 
 class FileNotExistError(Error):
     pass
+class BadCoordinateError(Error):
+    pass
+class BadButtonError(Error):
+    pass
