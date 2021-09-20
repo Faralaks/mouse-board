@@ -9,6 +9,8 @@ import datetime as dt
 from os import path
 from errors import *
 
+def no_proc(val): return val
+
 def proc_file_path(file_path: str) -> str:
     try:
         file_path = str(file_path)
@@ -46,6 +48,9 @@ def proc_btn_val(btn: str) -> str:
     if btn != "left" and btn != "right": raise BadButtonError("btn value must be 'left' or 'right'")
 
     return btn
+
+
+
 
 
 

@@ -98,6 +98,7 @@ class App(tk.Tk):
             "x":pc.proc_x_val,
             "y":pc.proc_y_val,
             "btn":pc.proc_btn_val,
+            "text":pc.no_proc,
         }
 
         menu = tk.Menu(self)
@@ -155,8 +156,8 @@ class App(tk.Tk):
         f.close()
 
     def line2cmd(self, line: str) -> Union[None, fn.Command]:
-        if line.strip() == "": return self.funcs["wait"](full=line)
-        
+        if line.strip() == "": return self.funcs["wait"][0](full=line)
+        print(line)
         split = line.split(CMD_SEPARATOR)
         func = self.funcs.get(split[0])
         if not func:
@@ -181,7 +182,7 @@ class App(tk.Tk):
                 error("Oh! There is some ERROR!", e)
                 return
         print("\t @Finish checking! No errors!\n")
-        return
+
         for command in commands:
             try:
                 command.do()
