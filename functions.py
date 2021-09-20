@@ -4,8 +4,10 @@ import time
 import pyautogui as pag
 import pyperclip as clipboard
 from tkinter.messagebox import showerror as error
+from tkinter.messagebox import showwarning as warning
 import datetime as dt
 from os import path
+from errors import *
 
 def paste_text(text):
     buffer = clipboard.paste()
@@ -13,14 +15,22 @@ def paste_text(text):
     pag.hotkey("ctrl"if sys.platform=="win32" else "command", "v")
     clipboard.copy(buffer)
 
+
+def check_file_path(file_path) -> None:
+    if not path.exists(file_path):
+        raise Exception("No such file: "+file_path)
+
 class Command:
     cmd = ""
     params = None
+    param_names = None
+    processed = {}
     i = 0
     no_i = False
     full = ""
 
-    def __init__(self, split: list, full: str, interval: float) -> None:
+    def __init__(self, split: list, full: str, interval: float, param_names: tuple) -> None:
+        self.param_names = param_names
         self.cmd = split[0]
         self.params = split[1:]
         self.full = full
@@ -37,7 +47,18 @@ class Command:
         print(dt.datetime.now(), self.__repr__()+" "+add)
 
     def do(self): pass
-    def check(self): pass
+
+    def check(self, processors: dict) -> None:
+        for num, param in enumerate(self.param_names):
+            processor = processors.get(param)
+            if not processor: NoProcessorError("No processor for parameter name %s"%param)
+            try:
+                self.processed[param] = processor(self.params[num])
+            except Error as e:
+                raise Error("Err: %s\nLine: %s"%(e, self.full))
+
+
+
 
 
 class Click(Command):
@@ -83,21 +104,14 @@ class Write(Command):
 class File(Command):
     file_path = ""
 
-    def __init__(self, split: list, full: str, interval: float) -> None:
-        super().__init__(split, full, interval)
+    def __init__(self, split: list, full: str, interval: float, param_names: tuple) -> None:
+        super().__init__(split, full, interval, param_names)
         self.file_path = path.abspath(self.params[0]) if self.params[0][0] == "." else self.params[0]
                 
     def do(self) -> None:
         self.log_call(add="file_path: "+self.file_path)
         with open(self.file_path, "r") as f:
             paste_text(f.read())
-        
-    def check(self) -> bool:
-        self.log_call(add="file_path: "+self.file_path)
-        if not path.exists(self.file_path):
-            error("No such file from line", self.full)
-            return True
-        return False
 
 
 class Wait(Command):

@@ -13,6 +13,8 @@ import pyautogui as pag
 from PIL import ImageTk
 
 import functions as fn
+import processors as pc
+from errors import *
 
 PATH_SEPARATOR = "\\"if sys.platform=="win32" else "/"
 CMD_SEPARATOR = '+'
@@ -84,11 +86,16 @@ class App(tk.Tk):
 
         self.funcs = {"click":fn.Click, "dclick":fn.Dclick,
                       "move":fn.Move, "moveto":fn.Moveto,
-                      "write":fn.Write, "file":fn.File,
+                      "write":fn.Write,
+                      "file":(fn.File, ("file_path",)),
                       "wait":fn.Wait,
                       "press":fn.Press,
                       "cimage":fn.Cimage,"dimage":fn.Dimage,"aimage":fn.Aimage, "wimage":fn.Wimage
                       }
+
+        self.param_processors = {
+            "file_path":pc.proc_file_path,
+        }
 
         menu = tk.Menu(self)
         menu.add_command(label='Open', command=self.load)
@@ -150,9 +157,9 @@ class App(tk.Tk):
         split = line.split(CMD_SEPARATOR)
         func = self.funcs.get(split[0])
         if not func:
-            error("Bad function name in line", line)
+            error("Bad function name", line)
             return None
-        return func(split, line, self.interval)
+        return func[0](split, line, self.interval, func[1])
 
     def start_clicking(self):
         lines = self.macros.get("1.0", tk.END).strip().split("\n")
@@ -164,8 +171,11 @@ class App(tk.Tk):
 
         print("\n\t @Start checking")
         for command in commands:
-            if command.check():
-                print("@ERROR in previous line")
+            try:
+                command.check(self.param_processors)
+            except Error as e:
+                print("@ERROR in previous macros line: %s"%e)
+                error("Oh! There is some ERROR!", e)
                 return
         print("\t @Finish checking! No errors!\n")
 
