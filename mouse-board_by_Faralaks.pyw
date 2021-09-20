@@ -85,12 +85,12 @@ class App(tk.Tk):
         self.interval = 0.1
 
         self.funcs = {"click":(fn.Click, ("x", "y", "btn")), "dclick":(fn.Dclick, ("x", "y")),
-                      "move":fn.Move, "moveto":fn.Moveto,
-                      "write":fn.Write,
+                      "move":(fn.Move, ("relative_x", "relative_y")), "moveto":(fn.Moveto, ("x", "y")),
+                      "write":(fn.Write, ("text",)),
                       "file":(fn.File, ("file_path",)),
-                      "wait":fn.Wait,
-                      "press":fn.Press,
-                      "cimage":fn.Cimage,"dimage":fn.Dimage,"aimage":fn.Aimage, "wimage":fn.Wimage
+                      "wait":(fn.Wait, ()),
+                      "press":(fn.Press, ("keys",)),
+                      "cimage":(fn.Cimage, ()),"dimage":(fn.Dimage, ()),"aimage":(fn.Aimage, ()), "wimage":(fn.Wimage, ())
                       }
 
         self.param_processors = {
@@ -181,7 +181,7 @@ class App(tk.Tk):
                 error("Oh! There is some ERROR!", e)
                 return
         print("\t @Finish checking! No errors!\n")
-
+        return
         for command in commands:
             try:
                 command.do()
