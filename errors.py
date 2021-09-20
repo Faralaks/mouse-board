@@ -12,3 +12,5 @@ class BadCoordinateError(Error):
     pass
 class BadButtonError(Error):
     pass
+class ValLT0Error(Error):
+    pass

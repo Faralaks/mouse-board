@@ -85,7 +85,7 @@ class App(tk.Tk):
         self.interval = 0.1
 
         self.funcs = {"click":(fn.Click, ("x", "y", "btn")), "dclick":(fn.Dclick, ("x", "y")),
-                      "move":(fn.Move, ("relative_x", "relative_y")), "moveto":(fn.Moveto, ("x", "y")),
+                      "move":(fn.Move, ("relative_x", "relative_y", "time")), "moveto":(fn.Moveto, ("x", "y", "time")),
                       "write":(fn.Write, ("text",)),
                       "file":(fn.File, ("file_path",)),
                       "wait":(fn.Wait, ()),
@@ -95,10 +95,13 @@ class App(tk.Tk):
 
         self.param_processors = {
             "file_path":pc.proc_file_path,
-            "x":pc.proc_x_val,
-            "y":pc.proc_y_val,
+            "x":pc.proc_i_gt0_val,
+            "y":pc.proc_i_gt0_val,
             "btn":pc.proc_btn_val,
             "text":pc.no_proc,
+            "time":pc.proc_f_gt0_val,
+            "relative_x":pc.proc_rel_val,
+            "relative_y":pc.proc_rel_val,
         }
 
         menu = tk.Menu(self)
@@ -183,6 +186,7 @@ class App(tk.Tk):
                 return
         print("\t @Finish checking! No errors!\n")
 
+        print("\t@Macros START!")
         for command in commands:
             try:
                 command.do()
