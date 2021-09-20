@@ -46,7 +46,7 @@ class Command:
     def log_call(self, add="") -> None:
         print(dt.datetime.now(), self.__repr__()+" "+add)
 
-    def do(self): pass
+    def do(self): self.log_call()
 
     def check(self, processors: dict) -> None:
         print("---", self.full)
@@ -57,11 +57,13 @@ class Command:
             try:
                 res = processor(self.params[num])
                 setattr(self, param, res)
-            except Error as e:
+            except Exception as e:
                 raise Error("Err: %s\nLine: %s"%(e, self.full))
 
 
-
+class Wait(Command):
+    def __init__(self, split: list=("wait", 0), full: str="", interval: float=0.0, param_names: tuple=()) -> None:
+        super().__init__(split, full, interval, param_names)
 
 
 class Click(Command):
@@ -79,10 +81,8 @@ class Click(Command):
         except Exception as e:
             raise UnknownError("Error while doing command: %s" % e)
 
-
 class Dclick(Command):
     x, y = 0, 0
-
     def __init__(self, split: list, full: str, interval: float, param_names: tuple) -> None:
         super().__init__(split, full, interval, param_names)
 
@@ -96,22 +96,18 @@ class Dclick(Command):
 
 class Write(Command):
     text = ""
+    def __init__(self, split: list, full: str, interval: float, param_names: tuple) -> None:
+        super().__init__(split, full, interval, param_names)
 
-    def __init__(self, split: list, full: str, interval: float) -> None:
-        super().__init__(split, full, interval)
-        self.text = self.params[0]
-                
     def do(self) -> None:
         self.log_call()
-        paste_text(self.text)
-        
-    def check(self) -> bool:
-        self.log_call()
-        return False
+        try:
+            paste_text(self.text)
+        except Exception as e:
+            raise UnknownError("Error while doing command: %s" % e)
 
 class File(Command):
     file_path = ""
-
     def __init__(self, split: list, full: str, interval: float, param_names: tuple) -> None:
         super().__init__(split, full, interval, param_names)
 
@@ -124,62 +120,26 @@ class File(Command):
             raise UnknownError("Error while doing command: %s"%e)
 
 
-
-class Wait(Command):
-    def __init__(self, split: list=("wait", 0), full: str="", interval: float=0.0) -> None:
-        super().__init__(split, full, interval)
-                
-    def do(self) -> None:
-        self.log_call()
-        
-    def check(self) -> bool:
-        self.log_call()
-        return False
-
-
 class Move(Command):
-    x = 0
-    y = 0
-    slow = 0
-
-    def __init__(self, split: list, full: str, interval: float) -> None:
-        super().__init__(split, full, interval)
-        self.x, self.y, self.slow = int(self.params[0]), int(self.params[1]), int(self.params[2])
+    relative_x, relative_y, time = 0, 0, 0.0
+    def __init__(self, split: list, full: str, interval: float, param_names: tuple) -> None:
+        super().__init__(split, full, interval, param_names)
 
     def do(self) -> None:
         self.log_call()
-        pag.move(self.x, self.y, self.slow)
-
-    def check(self) -> bool:
-        self.log_call()
-        if self.slow < 0:
-            error("Oh! Bad Slow parameter in line", self.full)
-            return True
-        return False
-
+        try:
+            pag.move(self.relative_x, self.relative_y, self.time)
+        except Exception as e:
+            raise UnknownError("Error while doing command: %s"%e)
 
 class Moveto(Command):
-    x = 0
-    y = 0
-    slow = 0
-
-    def __init__(self, split: list, full: str, interval: float) -> None:
-        super().__init__(split, full, interval)
-        self.x, self.y, self.slow = int(self.params[0]), int(self.params[1]), int(self.params[2])
+    x, y, time = 0, 0, 0.0
+    def __init__(self, split: list, full: str, interval: float, param_names: tuple) -> None:
+        super().__init__(split, full, interval, param_names)
 
     def do(self) -> None:
         self.log_call()
-        pag.moveTo(self.x, self.y, self.slow)
-
-    def check(self) -> bool:
-        self.log_call()
-        if not pag.onScreen(self.x, self.y):
-            error("Oh! Wrong point in line", self.full)
-            return True
-        if self.slow < 0:
-            error("Oh! Bad Slow parameter in line", self.full+"\nBad Slow is "+str(self.slow))
-            return True
-        return False
+        pag.moveTo(self.x, self.y, self.time)
 
 
 class Press(Command):
