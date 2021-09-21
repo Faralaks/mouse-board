@@ -11,6 +11,7 @@ from typing import Union
 
 import pyautogui as pag
 from PIL import ImageTk
+from pyscreeze import locateAll
 
 import functions as fn
 import processors as pc
@@ -39,7 +40,9 @@ class About(tk.Toplevel):
         self.photo = photo
         self.image = ImageTk.PhotoImage(self.photo)
         self.mode = tk.StringVar()
+        self.image_found = tk.StringVar()
         self.mode.set("coordinates")
+        self.image_found.set("")
 
         
         self.geometry("%sx%s+0+0"%(self.w, self.h))
@@ -57,8 +60,8 @@ class About(tk.Toplevel):
         btn_aimage.configure(font=("Arial", 8))
         btn_exit.configure(font=("Arial", 8))
         btn_aimage.grid(row=0, column=6)
-        btn_exit.grid(row=0, column=7)
-
+        tk.Label(self.frame, textvariable=self.image_found).grid(row=0, column=7)
+        btn_exit.grid(row=0, column=8)
 
         self.canvas = tk.Canvas(self, height=self.h, width=self.w, highlightthickness=1)
         self.img_obj = self.canvas.create_image(0, 0, anchor='nw', image=self.image)
@@ -72,7 +75,16 @@ class About(tk.Toplevel):
         self.destroy()
 
     def aimage_preview(self, _=None):
-        pass
+        image_path = askopenfilename(initialdir=os.getcwd())
+        if not image_path: return
+        positions = list(locateAll(image_path, self.photo))
+        self.image_found.set("Found %s"%len(positions))
+        for pos in positions:
+            self.canvas.create_rectangle(
+                pos[0], pos[1], pos[0]+pos[2], pos[1]+pos[3],
+                outline="#f50", fill="#f50"
+            )
+
 
     def click(self, event: tk.Event):
         mode = self.mode.get()
