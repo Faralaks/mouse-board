@@ -175,9 +175,10 @@ class App(tk.Tk):
         f.write(points)
         f.close()
 
-    def get_file_path(self):
+    def get_file_path(self, return_value=False):
         file = askopenfilename(initialdir=os.getcwd())
         if not file: return
+        if return_value: return file
         self.write_in_macros(file.replace("/", PATH_SEPARATOR), point=tk.INSERT, end="")
 
     def load(self):
