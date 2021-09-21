@@ -51,9 +51,13 @@ class About(tk.Toplevel):
         tk.Radiobutton(self.frame, text="click left", value="left", variable=self.mode, padx=15).grid(row=0, column=2)
         tk.Radiobutton(self.frame, text="click right", value="right", variable=self.mode, padx=15).grid(row=0, column=3)
         tk.Radiobutton(self.frame, text="dclick", value="dclick", variable=self.mode, padx=15).grid(row=0, column=4)
+        tk.Radiobutton(self.frame, text="Cut image", value="cut", variable=self.mode, padx=15).grid(row=0, column=5)
+        btn_aimage = tk.Button(self.frame, text="Test aimage", command=self.aimage_preview)
         btn_exit = tk.Button(self.frame, text="Exit", command=self.on_escape)
+        btn_aimage.configure(font=("Arial", 8))
         btn_exit.configure(font=("Arial", 8))
-        btn_exit.grid(row=0, column=5)
+        btn_aimage.grid(row=0, column=6)
+        btn_exit.grid(row=0, column=7)
 
 
         self.canvas = tk.Canvas(self, height=self.h, width=self.w, highlightthickness=1)
@@ -67,12 +71,17 @@ class About(tk.Toplevel):
         self.parent.deiconify()
         self.destroy()
 
+    def aimage_preview(self, _=None):
+        pass
+
     def click(self, event: tk.Event):
         mode = self.mode.get()
         if mode == "left" or mode == "right":
             self.write("click%s%s%s%s%s%s" % (PARAM_SEP, event.x, PARAM_SEP, event.y, PARAM_SEP, mode), add_time=True, end="\n")
         elif mode == "dclick":
             self.write("dclick%s%s%s%s" % (PARAM_SEP, event.x, PARAM_SEP, event.y), add_time=True, end="\n")
+        elif mode == "cut":
+            pass#self.write("dclick%s%s%s%s" % (PARAM_SEP, event.x, PARAM_SEP, event.y), add_time=True, end="\n")
         else: self.write("%s%s%s" % (event.x, PARAM_SEP, event.y), point=tk.INSERT)
 
 
