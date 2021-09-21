@@ -58,7 +58,7 @@ class About(tk.Toplevel):
         tk.Radiobutton(self.frame, text="dclick", value="dclick", variable=self.mode, padx=15).grid(row=0, column=4)
         btn_cut = tk.Button(self.frame, text="Cut image", padx=3)
         btn_aimage = tk.Button(self.frame, text="Test aimage", command=self.aimage_preview)
-        btn_exit = tk.Button(self.frame, text="Exit", command=self.on_escape)
+        btn_exit = tk.Button(self.frame, text="Exit", command=self.on_escape, padx=4)
         btn_aimage.configure(font=("Arial", 8))
         btn_cut.configure(font=("Arial", 8))
         btn_exit.configure(font=("Arial", 8))
