@@ -1,13 +1,13 @@
+import datetime as dt
 import sys
 import time
+from os import path
 
 import pyautogui as pag
 import pyperclip as clipboard
-from tkinter.messagebox import showerror as error
-from tkinter.messagebox import showwarning as warning
-import datetime as dt
-from os import path
+
 from errors import *
+
 
 def paste_text(text):
     buffer = clipboard.paste()
