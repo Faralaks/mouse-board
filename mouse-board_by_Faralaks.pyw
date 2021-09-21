@@ -68,8 +68,12 @@ class About(tk.Toplevel):
         self.destroy()
 
     def click(self, event: tk.Event):
-        self.write("click"+CMD_SEPARATOR+"%s%s%s%s%s"%(
-            event.x, CMD_SEPARATOR, event.y, CMD_SEPARATOR, "right" if event.num==3 else "left"), with_time=False)
+        mode = self.mode.get()
+        if mode == "left" or mode == "right":
+            self.write("click%s%s%s%s%s%s"%(CMD_SEPARATOR, event.x, CMD_SEPARATOR, event.y, CMD_SEPARATOR, mode), add_time=True, end="\n")
+        elif mode == "dclick":
+            self.write("dclick%s%s%s%s"%(CMD_SEPARATOR, event.x, CMD_SEPARATOR, event.y), add_time=True, end="\n")
+        else: self.write("%s%s%s"%(event.x, CMD_SEPARATOR, event.y), point=tk.INSERT)
 
 
 
@@ -149,7 +153,7 @@ class App(tk.Tk):
             self.interval = 0.1
 
 
-    def write_in_macros(self, text, point=tk.END, add_time=False, end="\n"):
+    def write_in_macros(self, text, point=tk.END, add_time=False, end=""):
         if add_time: 
             text += CMD_SEPARATOR+str(self.interval)
         self.macros.insert(point, text+end)
@@ -173,7 +177,7 @@ class App(tk.Tk):
         if not f: return
         lines = f.read().strip().split("\n")
         for line in lines:
-            self.write_in_macros(line)
+            self.write_in_macros(line, end="\n")
         f.close()
 
     def line2cmd(self, line: str) -> Union[None, fn.Command]:
