@@ -38,22 +38,32 @@ class About(tk.Toplevel):
         self.frame = tk.Frame(self)
         self.photo = photo
         self.image = ImageTk.PhotoImage(self.photo)
+        self.mode = tk.StringVar()
+        self.mode.set("coordinates")
 
         
         self.geometry("%sx%s+0+0"%(self.w, self.h))
         self.frame.grid()
         self.focus()
 
+        self.overrideredirect(True)
+        tk.Radiobutton(self.frame, text="coordinates", value="coordinates", variable=self.mode, padx=15).grid(row=0, column=0)
+        tk.Radiobutton(self.frame, text="click left", value="left", variable=self.mode, padx=15).grid(row=0, column=2)
+        tk.Radiobutton(self.frame, text="click right", value="right", variable=self.mode, padx=15).grid(row=0, column=3)
+        tk.Radiobutton(self.frame, text="dclick", value="dclick", variable=self.mode, padx=15).grid(row=0, column=4)
+        btn_exit = tk.Button(self.frame, text="Exit", command=self.on_escape)
+        btn_exit.configure(font=("Arial", 8))
+        btn_exit.grid(row=0, column=5)
 
-        self.canvas = tk.Canvas(self, height=self.h, width=self.w)
+
+        self.canvas = tk.Canvas(self, height=self.h, width=self.w, highlightthickness=1)
         self.img_obj = self.canvas.create_image(0, 0, anchor='nw', image=self.image)
-        self.canvas.grid(row=0, column=0)
+        self.canvas.grid(row=1, column=0)
         
         self.canvas.bind('<1>', self.click)
-        self.canvas.bind('<3>', self.click)
         self.bind("<Escape>", self.on_escape)
         
-    def on_escape(self, _):
+    def on_escape(self, _=None):
         self.parent.deiconify()
         self.destroy()
 
