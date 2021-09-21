@@ -41,8 +41,10 @@ class About(tk.Toplevel):
         self.image = ImageTk.PhotoImage(self.photo)
         self.mode = tk.StringVar()
         self.image_found = tk.StringVar()
+        self.confidence = tk.StringVar()
         self.mode.set("coordinates")
         self.image_found.set("")
+        self.confidence.set("0.98")
 
         
         self.geometry("%sx%s+0+0"%(self.w, self.h))
@@ -60,8 +62,10 @@ class About(tk.Toplevel):
         btn_aimage.configure(font=("Arial", 8))
         btn_exit.configure(font=("Arial", 8))
         btn_aimage.grid(row=0, column=6)
-        tk.Label(self.frame, textvariable=self.image_found).grid(row=0, column=7)
-        btn_exit.grid(row=0, column=8)
+        tk.Label(self.frame, text="Confidence").grid(row=0, column=7)
+        tk.Entry(self.frame, textvariable=self.confidence, width=4).grid(row=0, column=8)
+        tk.Label(self.frame, textvariable=self.image_found).grid(row=0, column=9)
+        btn_exit.grid(row=0, column=11, padx=25)
 
         self.canvas = tk.Canvas(self, height=self.h, width=self.w, highlightthickness=1)
         self.img_obj = self.canvas.create_image(0, 0, anchor='nw', image=self.image)
@@ -74,16 +78,21 @@ class About(tk.Toplevel):
         self.parent.deiconify()
         self.destroy()
 
-    def aimage_preview(self, _=None):
-        image_path = askopenfilename(initialdir=os.getcwd())
+    def aimage_preview(self, _=None, file=None):
+        self.canvas.create_image(0, 0, anchor='nw', image=self.image)
+        image_path = askopenfilename(initialdir=os.getcwd()) if not file else file
         if not image_path: return
-        positions = list(locateAll(image_path, self.photo))
+        confidence = float(self.confidence.get())
+        positions = list(locateAll(image_path, self.photo, confidence=confidence))
         self.image_found.set("Found %s"%len(positions))
         for pos in positions:
-            self.canvas.create_rectangle(
-                pos[0], pos[1], pos[0]+pos[2], pos[1]+pos[3],
-                outline="#f50", fill="#f50"
-            )
+            center = pag.center(pos)
+            self.canvas.create_rectangle(pos[0], pos[1], pos[0]+pos[2], pos[1]+pos[3], outline="red")
+            self.canvas.create_rectangle(center[0]-1, center[1]-1, center[0]+1, center[1]+1, fill="green")
+        btn_try_again = tk.Button(self.frame, text="Try again", command=lambda: self.aimage_preview(file=image_path))
+        btn_try_again.configure(font=("Arial", 8))
+        btn_try_again.grid(row=0, column=10)
+
 
 
     def click(self, event: tk.Event):
