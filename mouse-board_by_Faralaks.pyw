@@ -17,7 +17,7 @@ import processors as pc
 from errors import *
 
 PATH_SEPARATOR = "\\"if sys.platform=="win32" else "/"
-CMD_SEPARATOR = '+'
+PARAM_SEP = '+'
 
 pag.FAILSAFE = False
 
@@ -70,17 +70,17 @@ class About(tk.Toplevel):
     def click(self, event: tk.Event):
         mode = self.mode.get()
         if mode == "left" or mode == "right":
-            self.write("click%s%s%s%s%s%s"%(CMD_SEPARATOR, event.x, CMD_SEPARATOR, event.y, CMD_SEPARATOR, mode), add_time=True, end="\n")
+            self.write("click%s%s%s%s%s%s" % (PARAM_SEP, event.x, PARAM_SEP, event.y, PARAM_SEP, mode), add_time=True, end="\n")
         elif mode == "dclick":
-            self.write("dclick%s%s%s%s"%(CMD_SEPARATOR, event.x, CMD_SEPARATOR, event.y), add_time=True, end="\n")
-        else: self.write("%s%s%s"%(event.x, CMD_SEPARATOR, event.y), point=tk.INSERT)
+            self.write("dclick%s%s%s%s" % (PARAM_SEP, event.x, PARAM_SEP, event.y), add_time=True, end="\n")
+        else: self.write("%s%s%s" % (event.x, PARAM_SEP, event.y), point=tk.INSERT)
 
 
 
 def change_separator(new_val):
     if not new_val: return
-    global CMD_SEPARATOR
-    CMD_SEPARATOR = new_val
+    global PARAM_SEP
+    PARAM_SEP = new_val
 
 
 class App(tk.Tk):
@@ -155,7 +155,7 @@ class App(tk.Tk):
 
     def write_in_macros(self, text, point=tk.END, add_time=False, end=""):
         if add_time: 
-            text += CMD_SEPARATOR+str(self.interval)
+            text += PARAM_SEP + str(self.interval)
         self.macros.insert(point, text+end)
 
     def save(self):
@@ -183,7 +183,7 @@ class App(tk.Tk):
     def line2cmd(self, line: str) -> Union[None, fn.Command]:
         if line.strip() == "": return self.funcs["wait"][0](full=line)
         print(line)
-        split = line.split(CMD_SEPARATOR)
+        split = line.split(PARAM_SEP)
         func = self.funcs.get(split[0])
         if not func:
             error("Bad function name", line)
