@@ -149,10 +149,10 @@ class App(tk.Tk):
             self.interval = 0.1
 
 
-    def write_cmd(self, text, point=tk.END, with_time=True):
-        if not with_time: 
+    def write_in_macros(self, text, point=tk.END, add_time=False, end="\n"):
+        if add_time: 
             text += CMD_SEPARATOR+str(self.interval)
-        self.macros.insert(point, text+"\n")
+        self.macros.insert(point, text+end)
 
     def save(self):
         f = asksaveasfile(defaultextension=".txt", initialdir=os.getcwd(), mode="w",
@@ -165,15 +165,15 @@ class App(tk.Tk):
     def get_file_path(self):
         file = askopenfilename(initialdir=os.getcwd())
         if not file: return
-        self.write_cmd(file.replace("/", PATH_SEPARATOR), point=tk.INSERT, with_time=True)
+        self.write_in_macros(file.replace("/", PATH_SEPARATOR), point=tk.INSERT, end="")
 
     def load(self):
         self.macros.delete(1.0, tk.END)
         f = askopenfile(initialdir=os.getcwd(), filetypes = (("Text files","*.txt*"), ("All files", "*.*")), mode="r")
-        #if not f: return
-        points = f.read().strip().split("\n")
-        for three in points:
-            self.write_cmd(three)
+        if not f: return
+        lines = f.read().strip().split("\n")
+        for line in lines:
+            self.write_in_macros(line)
         f.close()
 
     def line2cmd(self, line: str) -> Union[None, fn.Command]:
@@ -220,7 +220,7 @@ class App(tk.Tk):
         self.wm_state("iconic")
         time.sleep(0.5)
         self.photo = pag.screenshot()
-        about = About(self, self.photo, self.write_cmd)
+        about = About(self, self.photo, self.write_in_macros)
         about.grab_set()
 
 
