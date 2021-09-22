@@ -17,6 +17,7 @@ import functions as fn
 import processors as pc
 from errors import *
 
+def EMPTY_FUNC(): pass
 PATH_SEPARATOR = "\\"if sys.platform=="win32" else "/"
 PARAM_SEP = '+'
 
@@ -42,9 +43,12 @@ class About(tk.Toplevel):
         self.mode = tk.StringVar()
         self.image_found = tk.StringVar()
         self.confidence = tk.StringVar()
+        self.coord_var = tk.StringVar()
         self.mode.set("coordinates")
         self.image_found.set("")
         self.confidence.set("0.98")
+        self.coordinates = (0, 0)
+        self.saved_coordinates = (0, 0)
 
         
         self.geometry("%sx%s+0+0"%(self.w, self.h))
@@ -52,21 +56,22 @@ class About(tk.Toplevel):
         self.focus()
 
         self.overrideredirect(True)
-        tk.Radiobutton(self.frame, text="coordinates", value="coordinates", variable=self.mode, padx=15).grid(row=0, column=0)
-        tk.Radiobutton(self.frame, text="click left", value="left", variable=self.mode, padx=15).grid(row=0, column=2)
-        tk.Radiobutton(self.frame, text="click right", value="right", variable=self.mode, padx=15).grid(row=0, column=3)
-        tk.Radiobutton(self.frame, text="dclick", value="dclick", variable=self.mode, padx=15).grid(row=0, column=4)
+        tk.Label(self.frame, textvariable=self.coord_var).grid(row=0, column=0)
+        tk.Radiobutton(self.frame, text="coordinates", value="coordinates", variable=self.mode, padx=15).grid(row=0, column=2)
+        tk.Radiobutton(self.frame, text="click left", value="left", variable=self.mode, padx=15).grid(row=0, column=3)
+        tk.Radiobutton(self.frame, text="click right", value="right", variable=self.mode, padx=15).grid(row=0, column=4)
+        tk.Radiobutton(self.frame, text="dclick", value="dclick", variable=self.mode, padx=15).grid(row=0, column=5)
         btn_cut = tk.Button(self.frame, text="Cut image", padx=3)
         btn_aimage = tk.Button(self.frame, text="Test aimage", command=self.aimage_preview)
         btn_exit = tk.Button(self.frame, text="Exit", command=self.on_escape, padx=4)
         btn_aimage.configure(font=("Arial", 8))
         btn_cut.configure(font=("Arial", 8))
         btn_exit.configure(font=("Arial", 8))
-        btn_cut.grid(row=0, column=5, padx=25)
-        btn_aimage.grid(row=0, column=6)
-        tk.Label(self.frame, text="Confidence").grid(row=0, column=7)
-        tk.Entry(self.frame, textvariable=self.confidence, width=4).grid(row=0, column=8)
-        tk.Label(self.frame, textvariable=self.image_found).grid(row=0, column=9)
+        btn_cut.grid(row=0, column=6, padx=25)
+        btn_aimage.grid(row=0, column=7)
+        tk.Label(self.frame, text="Confidence").grid(row=0, column=8)
+        tk.Entry(self.frame, textvariable=self.confidence, width=4).grid(row=0, column=9)
+        tk.Label(self.frame, textvariable=self.image_found).grid(row=0, column=10)
         btn_exit.grid(row=0, column=11, padx=25)
 
         self.canvas = tk.Canvas(self, height=self.h, width=self.w, highlightthickness=1)
@@ -75,7 +80,8 @@ class About(tk.Toplevel):
         
         self.canvas.bind('<1>', self.click)
         self.bind("<Escape>", self.on_escape)
-        
+        self.bind("<Motion>", self.on_motion)
+
     def on_escape(self, _=None):
         self.parent.deiconify()
         self.destroy()
@@ -95,6 +101,11 @@ class About(tk.Toplevel):
         btn_try_again.configure(font=("Arial", 8))
         btn_try_again.grid(row=0, column=10)
 
+
+    def on_motion(self, event: tk.Event, do=EMPTY_FUNC):
+        self.coordinates = (event.x, event.y)
+        self.coord_var.set("x: %s   y: %s"%(event.x, event.y))
+        do()
 
 
     def click(self, event: tk.Event):
