@@ -5,7 +5,7 @@ import time
 import webbrowser as browser
 import tkinter as tk
 from os import path
-from tkinter.filedialog import askopenfile, asksaveasfile, askopenfilename
+from tkinter.filedialog import askopenfile, asksaveasfile, askopenfilename, asksaveasfilename
 from tkinter.messagebox import showerror as error
 from typing import Union
 
@@ -50,6 +50,7 @@ class About(tk.Toplevel):
         self.coordinates = None
         self.saved_coordinates = None
         self.on_iteration = EMPTY_FUNC
+        self.cut_rect = None
 
         
         self.geometry("%sx%s+0+0"%(self.w, self.h))
@@ -106,6 +107,9 @@ class About(tk.Toplevel):
         self.coord_var.set("x: %s   y: %s"%(event.x, event.y))
         self.on_iteration()
 
+    def draw_rect(self):
+        if self.cut_rect: self.canvas.delete(self.cut_rect)
+        self.cut_rect = self.canvas.create_rectangle(self.saved_coordinates[0], self.saved_coordinates[1], self.coordinates[0], self.coordinates[1], outline="blue")
 
     def click(self, event: tk.Event):
         mode = self.mode.get()
@@ -113,6 +117,23 @@ class About(tk.Toplevel):
             self.write("click%s%s%s%s%s%s" % (PARAM_SEP, event.x, PARAM_SEP, event.y, PARAM_SEP, mode), add_time=True, end="\n")
         elif mode == "dclick":
             self.write("dclick%s%s%s%s" % (PARAM_SEP, event.x, PARAM_SEP, event.y), add_time=True, end="\n")
+        elif mode == "cut":
+            if self.saved_coordinates:
+                l_cord = min(self.saved_coordinates[0], self.coordinates[0])
+                r_cord = max(self.saved_coordinates[0], self.coordinates[0])
+                t_cord = min(self.saved_coordinates[1], self.coordinates[1])
+                b_cord = max(self.saved_coordinates[1], self.coordinates[1])
+                cut = self.photo.crop((l_cord, t_cord, r_cord, b_cord))
+                file = asksaveasfilename(initialdir=os.getcwd(), defaultextension=".jpg", filetypes=(("Image files", "*.jpg*"), ("All files", "*.*")))
+                if file: cut.save(file, quality=100)
+
+                self.saved_coordinates = None
+                self.on_iteration = EMPTY_FUNC
+                self.canvas.delete(self.cut_rect)
+                return
+            self.saved_coordinates = (event.x, event.y)
+            self.on_iteration = self.draw_rect
+
         else: self.write("%s%s%s" % (event.x, PARAM_SEP, event.y), point=tk.INSERT)
 
 
