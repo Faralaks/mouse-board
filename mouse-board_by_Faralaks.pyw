@@ -47,8 +47,9 @@ class About(tk.Toplevel):
         self.mode.set("coordinates")
         self.image_found.set("")
         self.confidence.set("0.98")
-        self.coordinates = (0, 0)
-        self.saved_coordinates = (0, 0)
+        self.coordinates = None
+        self.saved_coordinates = None
+        self.on_iteration = EMPTY_FUNC
 
         
         self.geometry("%sx%s+0+0"%(self.w, self.h))
@@ -61,13 +62,11 @@ class About(tk.Toplevel):
         tk.Radiobutton(self.frame, text="click left", value="left", variable=self.mode, padx=15).grid(row=0, column=3)
         tk.Radiobutton(self.frame, text="click right", value="right", variable=self.mode, padx=15).grid(row=0, column=4)
         tk.Radiobutton(self.frame, text="dclick", value="dclick", variable=self.mode, padx=15).grid(row=0, column=5)
-        btn_cut = tk.Button(self.frame, text="Cut image", padx=3)
+        tk.Radiobutton(self.frame, value="cut", variable=self.mode, text="Cut image", padx=15).grid(row=0, column=6)
         btn_aimage = tk.Button(self.frame, text="Test aimage", command=self.aimage_preview)
         btn_exit = tk.Button(self.frame, text="Exit", command=self.on_escape, padx=4)
         btn_aimage.configure(font=("Arial", 8))
-        btn_cut.configure(font=("Arial", 8))
         btn_exit.configure(font=("Arial", 8))
-        btn_cut.grid(row=0, column=6, padx=25)
         btn_aimage.grid(row=0, column=7)
         tk.Label(self.frame, text="Confidence").grid(row=0, column=8)
         tk.Entry(self.frame, textvariable=self.confidence, width=4).grid(row=0, column=9)
@@ -102,10 +101,10 @@ class About(tk.Toplevel):
         btn_try_again.grid(row=0, column=10)
 
 
-    def on_motion(self, event: tk.Event, do=EMPTY_FUNC):
+    def on_motion(self, event: tk.Event):
         self.coordinates = (event.x, event.y)
         self.coord_var.set("x: %s   y: %s"%(event.x, event.y))
-        do()
+        self.on_iteration()
 
 
     def click(self, event: tk.Event):
