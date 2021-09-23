@@ -60,21 +60,24 @@ class About(tk.Toplevel):
         self.focus()
 
         self.overrideredirect(True)
-        tk.Label(self.frame, textvariable=self.coord_var).grid(row=0, column=0)
-        tk.Radiobutton(self.frame, text="coordinates", value="coordinates", variable=self.mode, padx=15).grid(row=0, column=2)
-        tk.Radiobutton(self.frame, text="click left", value="left", variable=self.mode, padx=15).grid(row=0, column=3)
-        tk.Radiobutton(self.frame, text="click right", value="right", variable=self.mode, padx=15).grid(row=0, column=4)
-        tk.Radiobutton(self.frame, text="dclick", value="dclick", variable=self.mode, padx=15).grid(row=0, column=5)
-        tk.Radiobutton(self.frame, value="cut", variable=self.mode, text="Cut image", padx=15).grid(row=0, column=6)
         btn_aimage = tk.Button(self.frame, text="Test aimage", command=self.aimage_preview)
         btn_exit = tk.Button(self.frame, text="Exit", command=self.on_escape, padx=4)
         btn_aimage.configure(font=("Arial", 8))
         btn_exit.configure(font=("Arial", 8))
-        btn_aimage.grid(row=0, column=7)
-        tk.Label(self.frame, text="Confidence").grid(row=0, column=8)
-        tk.Entry(self.frame, textvariable=self.confidence, width=4).grid(row=0, column=9)
-        tk.Label(self.frame, textvariable=self.image_found).grid(row=0, column=10)
-        btn_exit.grid(row=0, column=11, padx=25)
+
+
+
+        tk.Label(self.frame, textvariable=self.coord_var).grid(row=0, column=0)
+        tk.Radiobutton(self.frame, text="coordinates", value="coordinates", variable=self.mode, padx=15).grid(row=0, column=1)
+        tk.Radiobutton(self.frame, text="click left", value="left", variable=self.mode, padx=15).grid(row=0, column=2)
+        tk.Radiobutton(self.frame, text="click right", value="right", variable=self.mode, padx=15).grid(row=0, column=3)
+        tk.Radiobutton(self.frame, text="dclick", value="dclick", variable=self.mode, padx=15).grid(row=0, column=4)
+        tk.Radiobutton(self.frame, value="cut", variable=self.mode, text="Cut image", padx=15).grid(row=0, column=5)
+        btn_aimage.grid(row=0, column=6)
+        tk.Label(self.frame, text="Confidence").grid(row=0, column=7)
+        tk.Entry(self.frame, textvariable=self.confidence, width=4).grid(row=0, column=8)
+        tk.Label(self.frame, textvariable=self.image_found).grid(row=0, column=9)
+        btn_exit.grid(row=0, padx=15, column=11)
 
         self.canvas = tk.Canvas(self, height=self.h, width=self.w, highlightthickness=1)
         self.img_obj = self.canvas.create_image(0, 0, anchor='nw', image=self.image)
@@ -126,13 +129,14 @@ class About(tk.Toplevel):
                 t_cord = min(self.saved_coordinates[1], self.coordinates[1])
                 b_cord = max(self.saved_coordinates[1], self.coordinates[1])
                 cut = self.photo.crop((l_cord, t_cord, r_cord, b_cord))
+                self.on_iteration = EMPTY_FUNC
+                self.saved_coordinates = None
+                self.canvas.delete(self.cut_rect)
+
                 file = asksaveasfilename(initialdir=os.getcwd(), defaultextension=".jpg", filetypes=(("Image files", "*.jpg*"), ("All files", "*.*")))
                 if file: cut.save(file, quality=100)
-
-                self.saved_coordinates = None
-                self.on_iteration = EMPTY_FUNC
-                self.canvas.delete(self.cut_rect)
                 return
+
             self.saved_coordinates = (event.x, event.y)
             self.on_iteration = self.draw_rect
 
