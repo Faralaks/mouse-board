@@ -52,13 +52,13 @@ class Command:
         print("---", self.full)
         for num, param in enumerate(self.param_names):
             processor = processors.get(param)
-            if not processor: NoProcessorError("No processor for parameter name %s"%param)
+            if not processor: raise NoProcessorError(param)
             print(">", param, self.params[num], num)
             try:
-                res = processor(self.params[num])
+                res = processor(self.params[num], param)
                 setattr(self, param, res)
             except Exception as e:
-                raise Error("Err: %s\nLine: %s"%(e, self.full))
+                raise Exception(e)
 
 
 class Wait(Command):

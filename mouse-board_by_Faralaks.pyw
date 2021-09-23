@@ -2,8 +2,8 @@ import datetime as dt
 import os
 import sys
 import time
-import webbrowser as browser
 import tkinter as tk
+import webbrowser as browser
 from os import path
 from tkinter.filedialog import askopenfile, asksaveasfile, askopenfilename, asksaveasfilename
 from tkinter.messagebox import showerror as error
@@ -15,7 +15,7 @@ from pyscreeze import locateAll
 
 import functions as fn
 import processors as pc
-from errors import *
+
 
 def EMPTY_FUNC(): pass
 PATH_SEPARATOR = "\\"if sys.platform=="win32" else "/"
@@ -247,7 +247,7 @@ class App(tk.Tk):
         split = line.split(PARAM_SEP)
         func = self.funcs.get(split[0])
         if not func:
-            error("Bad function name", line)
+            error("Oh! There is an ERROR!", "Bad function name in line: %s"%line)
             return None
         return func[0](split, line, self.interval, func[1])
 
@@ -255,19 +255,19 @@ class App(tk.Tk):
         lines = self.macros.get("1.0", tk.END).strip().split("\n")
         commands = list(map(self.line2cmd, lines))
         if None in commands: return
-        
-        self.wm_state("iconic")
-        time.sleep(0.5)
 
         print("\n\t @Start checking")
         for command in commands:
             try:
                 command.check(self.param_processors)
-            except Error as e:
+            except Exception as e:
                 print("@ERROR in previous macros line: %s"%e)
-                error("Oh! There is some ERROR!", e)
+                error("Oh! There is an ERROR!", "Error: %s\nLine: %s"%(e, command.full))
                 return
         print("\t @Finish checking! No errors!\n")
+
+        self.wm_state("iconic")
+        time.sleep(0.5)
 
         print("\t@Macros START!")
         for command in commands:
