@@ -24,9 +24,7 @@ class Command:
     cmd = ""
     params = None
     param_names = None
-    processed = {}
     i = 0
-    no_i = False
     full = ""
 
     def __init__(self, split: list, full: str, interval: float, param_names: tuple) -> None:
@@ -34,11 +32,15 @@ class Command:
         self.cmd = split[0]
         self.params = split[1:]
         self.full = full
-        try:
-            self.i = float(split[-1])
-        except ValueError:
+        if len(self.params) == len(param_names):
             self.i = interval
-            self.no_i = True
+        elif len(self.params)-1 == len(param_names):
+            try:
+                self.i = float(split[-1])
+            except ValueError:
+                self.i = interval
+        else: raise Exception("Count of given parameters not equal requirement count")
+
 
     def __repr__(self) -> str:
         return "cmd: %s, params: %s, i: %d"%(self.cmd, self.params, self.i)

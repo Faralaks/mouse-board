@@ -7,7 +7,6 @@ import webbrowser as browser
 from os import path
 from tkinter.filedialog import askopenfile, asksaveasfile, askopenfilename, asksaveasfilename
 from tkinter.messagebox import showerror as error
-from typing import Union
 
 import pyautogui as pag
 from PIL import ImageTk
@@ -26,9 +25,12 @@ pag.FAILSAFE = False
 
 log_file = open("log.txt", "a")
 
-#sys.stdout = log_file
-#sys.stderr = log_file
+sys.stdout = log_file
+sys.stderr = log_file
 print("\n\n <-------------| Logging Mouse-Board by Faralaks v3 |-------------> \n", dt.datetime.now(), "\n")
+
+
+show_error = lambda err: error("Oh! There is an ERROR!", err)
 
 
 class About(tk.Toplevel):
@@ -241,20 +243,24 @@ class App(tk.Tk):
             self.write_in_macros(line, end="\n")
         f.close()
 
-    def line2cmd(self, line: str) -> Union[None, fn.Command]:
+    def line2cmd(self, line: str) -> fn.Command:
         if line.strip() == "": return self.funcs["wait"][0](full=line)
         print(line)
         split = line.split(PARAM_SEP)
         func = self.funcs.get(split[0])
-        if not func:
-            error("Oh! There is an ERROR!", "Bad function name in line: %s"%line)
-            return None
-        return func[0](split, line, self.interval, func[1])
+        if not func: raise Exception("Bad function name in line: %s"%line)
+        try:
+            return func[0](split, line, self.interval, func[1])
+        except Exception as e:
+            raise Exception("Some problems with building command object \n Error: %s\nLine: %s"%(e, line))
 
     def start_clicking(self):
         lines = self.macros.get("1.0", tk.END).strip().split("\n")
-        commands = list(map(self.line2cmd, lines))
-        if None in commands: return
+        try:
+            commands = list(map(self.line2cmd, lines))
+        except Exception as e:
+            show_error(e)
+            return
 
         print("\n\t @Start checking")
         for command in commands:
