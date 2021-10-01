@@ -223,3 +223,16 @@ class Wimage(Command):
                 if (dt.datetime.now() - start_time).seconds > self.time_limit: raise TimeLimitReachedError("Image was not found for given time")
         except Exception as e: raise UnknownError("Error while doing command: %s" % e)
 
+
+
+
+FUNCS_AND_PARAMS = {"click": (Click, ("x", "y", "btn")), "dclick": (Dclick, ("x", "y")),
+              "move": (Move, ("relative_x", "relative_y", "time")), "moveto": (Moveto, ("x", "y", "time")),
+              "write": (Write, ("text",)),
+              "file": (File, ("file_path",)),
+              "wait": (Wait, ()),
+              "press": (Press, ("keys",)),
+              "cimage": (Cimage, ("file_path", "confidence", "btn", "clicks_count", "clicks_interval")),
+              "aimage": (Aimage, ("file_path", "confidence", "btn", "clicks_count", "clicks_interval", "find_interval")),
+              "dimage": (Dimage, ("file_path", "confidence")), "wimage": (Wimage, ("file_path", "confidence", "find_interval", "time_limit"))
+              }

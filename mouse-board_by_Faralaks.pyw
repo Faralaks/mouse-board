@@ -4,7 +4,6 @@ import sys
 import time
 import tkinter as tk
 import webbrowser as browser
-from os import path
 from tkinter.filedialog import askopenfile, asksaveasfile, askopenfilename, asksaveasfilename
 from tkinter.messagebox import showerror as error
 
@@ -14,6 +13,7 @@ from pyscreeze import locateAll
 
 import functions as fn
 import processors as pc
+import ui
 
 
 def EMPTY_FUNC(): pass
@@ -25,8 +25,8 @@ pag.FAILSAFE = False
 
 log_file = open("log.txt", "a")
 
-sys.stdout = log_file
-sys.stderr = log_file
+#sys.stdout = log_file
+#sys.stderr = log_file
 print("\n\n <-------------| Logging Mouse-Board by Faralaks v3 |-------------> \n", dt.datetime.now(), "\n")
 
 
@@ -88,7 +88,7 @@ class About(tk.Toplevel):
         self.bind("<Motion>", self.on_motion)
 
     def on_escape(self, _=None):
-        self.parent.deiconify()
+        ui.Window.frame_mapped(self.parent)
         self.destroy()
 
     def aimage_preview(self, _=None, file=None):
@@ -150,65 +150,30 @@ def change_separator(new_val):
     PARAM_SEP = new_val
 
 
-class App(tk.Tk):
+class App(ui.Window):
     def __init__(self):
         super().__init__()
-        self.frame = tk.Frame(self)
         self.photo = None
-        self.frame.grid()
-        self.geometry("1550x620+0+-10")
-        self.title("Mouse-Board by Faralaks v3")
-        icon = path.join(PATH_SEPARATOR.join(path.split(path.abspath(__file__))[:-1]), "icon.png")
-
-        self.iconphoto(True, tk.PhotoImage(file=icon))
-        self.bind("<Escape>", lambda event: self.destroy())
-
         self.interval = 0.1
+        self.funcs = fn.FUNCS_AND_PARAMS
+        self.param_processors = pc.PARAM2PROCESSOR
 
-        self.funcs = {"click":(fn.Click, ("x", "y", "btn")), "dclick":(fn.Dclick, ("x", "y")),
-                      "move":(fn.Move, ("relative_x", "relative_y", "time")), "moveto":(fn.Moveto, ("x", "y", "time")),
-                      "write":(fn.Write, ("text",)),
-                      "file":(fn.File, ("file_path",)),
-                      "wait":(fn.Wait, ()),
-                      "press":(fn.Press, ("keys",)),
-                      "cimage":(fn.Cimage, ("file_path", "confidence", "btn", "clicks_count", "clicks_interval")),
-                      "aimage":(fn.Aimage, ("file_path", "confidence", "btn", "clicks_count", "clicks_interval", "find_interval")),
-                      "dimage":(fn.Dimage, ("file_path", "confidence")),  "wimage":(fn.Wimage, ("file_path", "confidence", "find_interval", "time_limit"))
-                      }
 
-        self.param_processors = {
-            "file_path":pc.proc_file_path,
-            "x":pc.proc_i_gt0_val,
-            "y":pc.proc_i_gt0_val,
-            "clicks_count":pc.proc_i_gt0_val,
-            "time_limit":pc.proc_i_gt0_val,
-            "btn":pc.proc_btn_val,
-            "text":pc.no_proc,
-            "clicks_interval":pc.proc_f_gt0_val,
-            "find_interval":pc.proc_f_gt0_val,
-            "time":pc.proc_f_gt0_val,
-            "relative_x":pc.proc_rel_val,
-            "relative_y":pc.proc_rel_val,
-            "keys":pc.proc_keys,
-            "confidence":pc.proc_confidence,
-        }
 
-        menu = tk.Menu(self)
-        menu.add_command(label='Open', command=self.load)
-        menu.add_command(label='Save', command=self.save)
-        menu.add_command(label='Interval', command=lambda: self.change_interval(
+        ui.Button(self.frame, "RUN Macros", command=self.start_clicking, row=0, column=0)
+        ui.Button(self.frame, "ScreenShot", command=self.open_window, row=0, column=1)
+        ui.Button(self.frame, "Find File", command=self.get_file_path, row=0, column=2)
+
+        ui.Button(self.frame, row=0, column=3, text='Open', command=self.load)
+        ui.Button(self.frame, row=0, column=4, text='Save', command=self.save)
+        ui.Button(self.frame, row=0, column=5, text='Interval', command=lambda: self.change_interval(
             pag.prompt("Enter a standard interval between commands in seconds, for example, 1 or 1.5")))
-        menu.add_command(label='Separator', command=lambda: change_separator(
+        ui.Button(self.frame, row=0, column=6, text='Separator', command=lambda: change_separator(
             pag.prompt("Enter a new separator, for example, @ or -")))
-        menu.add_command(label='Need Help?', command=lambda : browser.open("https://github.com/Faralaks/mouse-board"))
-        self.config(menu=menu)
+        ui.Button(self.frame, row=0, column=7, text='Need Help?', command=lambda : browser.open("https://github.com/Faralaks/mouse-board"))
 
-        tk.Button(self.frame, text="RUN Macros", command=self.start_clicking).grid(row=0, column=0)
-        tk.Button(self.frame, text="ScreenShot", command=self.open_window).grid(row=0, column=1)
-        tk.Button(self.frame, text="Find File", command=self.get_file_path).grid(row=0, column=2)
-        self.macros = tk.Text(self.frame, height=25, width=154, wrap=tk.WORD)
-        self.macros.configure(font=("Trebuchet MS", 10, "bold"))
-        self.macros.grid(row=3, column=0, columnspan=10)
+        self.macros = tk.Text(self.frame, height=25, width=154, wrap=tk.WORD, relief="flat", font=("Trebuchet MS", 10, "bold"), bg="#303439", fg="#5da3b3", pady=30)
+        self.macros.grid(row=1, column=0, columnspan=15, pady=15)
 
 
     def change_interval(self, new_val) -> None:
@@ -276,7 +241,7 @@ class App(tk.Tk):
                 return
         print("\t @Finish checking! No errors!\n")
 
-        self.wm_state("iconic")
+        ui.Window.minimize(self)
         time.sleep(0.5)
 
         print("\t@Macros START!")
@@ -292,7 +257,7 @@ class App(tk.Tk):
 
 
     def open_window(self):
-        self.wm_state("iconic")
+        ui.Window.minimize(self)
         time.sleep(0.5)
         self.photo = pag.screenshot()
         about = About(self, self.photo, self.write_in_macros)

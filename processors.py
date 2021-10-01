@@ -51,3 +51,20 @@ def proc_keys(keys: str, _="") -> list:
                 raise BadKeyError(key)
     return keys
 
+
+PARAM2PROCESSOR = {
+            "file_path":proc_file_path,
+            "x":proc_i_gt0_val,
+            "y":proc_i_gt0_val,
+            "clicks_count":proc_i_gt0_val,
+            "time_limit":proc_i_gt0_val,
+            "btn":proc_btn_val,
+            "text":no_proc,
+            "clicks_interval":proc_f_gt0_val,
+            "find_interval":proc_f_gt0_val,
+            "time":proc_f_gt0_val,
+            "relative_x":proc_rel_val,
+            "relative_y":proc_rel_val,
+            "keys":proc_keys,
+            "confidence":proc_confidence,
+        }
