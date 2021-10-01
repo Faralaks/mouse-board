@@ -138,5 +138,5 @@ find_interval - interval in seconds between searches.
 - `click+800+900+right+0` - Clicks right mouse button on point (800, 900) with delay 0 sec before next command.
 - `write+This is the best project in the whole world!` - pats this text with default delay before next command.
 - `write+Is it the best project in the whole world?+1` - pats this text with 1 sec delay before next command.
-- `file+C:\data\file.txt` - pasts text content from file (absolute path) with default delay before next command.
-- `file+.\file.txt+22` - pasts text content from file (relative path) with 22 sec delay before next command.
+- `file+C:\data\file.txt` - pastes text content from file (absolute path) with default delay before next command.
+- `file+.\file.txt+22` - pastes text content from file (relative path) with 22 sec delay before next command.
