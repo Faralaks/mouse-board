@@ -133,7 +133,7 @@ find_interval - interval in seconds between searches.
 - Text pasts by `ctrl+v` or `commnd+v`. It means that text pasts from clipboard. If you had something in the clipboard, it will remain there.
 
 # Examples
-- `wait+4` - Just waits 2 seconds.
+- `wait+4` - Just waits 4 seconds.
 - `click+1000+500+left+0.1` - Clicks left mouse button on point (1000, 500) with delay 0.1 sec before next command.
 - `click+800+900+right+0` - Clicks right mouse button on point (800, 900) with delay 0 sec before next command.
 - `write+This is the best project in the whole world!` - pats this text with default delay before next command.
